@@ -301,9 +301,9 @@ public class TaskManagerServices {
 		// it strictly needs to happen AFTER the network stack has been initialized
 
 		// check if a value has been configured
-		long configuredMemory = taskManagerServicesConfiguration.getConfiguredMemory();
+		long configuredMemory = taskManagerServicesConfiguration.getConfiguredMemory(); // 获取配置的内存大小
 
-		MemoryType memType = taskManagerServicesConfiguration.getMemoryType();
+		MemoryType memType = taskManagerServicesConfiguration.getMemoryType(); // 内存类型:HEAP/OFF_HEAP
 
 		final long memorySize;
 
@@ -318,7 +318,7 @@ public class TaskManagerServices {
 			memorySize = configuredMemory << 20; // megabytes to bytes
 		} else {
 			// similar to #calculateNetworkBufferMemory(TaskManagerServicesConfiguration tmConfig)
-			float memoryFraction = taskManagerServicesConfiguration.getMemoryFraction();
+			float memoryFraction = taskManagerServicesConfiguration.getMemoryFraction(); // 0.7
 
 			if (memType == MemoryType.HEAP) {
 				// network buffers allocated off-heap -> use memoryFraction of the available heap:

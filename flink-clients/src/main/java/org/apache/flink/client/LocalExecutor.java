@@ -215,7 +215,7 @@ public class LocalExecutor extends PlanExecutor {
 				plan.setDefaultParallelism(slotsPerTaskManager * numTaskManagers);
 
 				Optimizer pc = new Optimizer(new DataStatistics(), jobExecutorServiceConfiguration);
-				OptimizedPlan op = pc.compile(plan);
+				OptimizedPlan op = pc.compile(plan); // 将给定的program plan转换为optimizedPlan
 
 				JobGraphGenerator jgg = new JobGraphGenerator(jobExecutorServiceConfiguration);
 				JobGraph jobGraph = jgg.compileJobGraph(op, plan.getJobId());

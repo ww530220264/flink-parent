@@ -74,10 +74,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This traversal creates the optimizer DAG from a program.
- * It works as a visitor that walks the program's flow in a depth-first fashion, starting from the data sinks.
+ * This traversal creates the optimizer DAG from a program. 	// 从program中偏离创建optimizer DAG,从dataSink开始
+ * It works as a visitor that walks the program's flow in a depth-first fashion, starting from the data sinks. // 使用深度优先遍历,为每个operator创建一个optimizer node
  * During the descent it creates an optimizer node for each operator, respectively data source or sink.
- * During the ascent it connects the nodes to the full graph.
+ * During the ascent it connects the nodes to the full graph. 	// 最后将node连接成完整的graph
  */
 public class GraphCreatingVisitor implements Visitor<Operator<?>> {
 

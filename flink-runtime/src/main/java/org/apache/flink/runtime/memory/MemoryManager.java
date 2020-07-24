@@ -121,9 +121,9 @@ public class MemoryManager {
 	 * @param pageSize The size of the pages handed out by the memory manager.
 	 * @param memoryType The type of memory (heap / off-heap) that the memory manager should allocate.
 	 * @param preAllocateMemory True, if the memory manager should immediately allocate all memory, false
-	 *                          if it should allocate and release the memory as needed.
+	 *                          if it should allocate and release the memory as needed. // 是否预先申请内存
 	 */
-	public MemoryManager(long memorySize, int numberOfSlots, int pageSize,
+	public MemoryManager(long memorySize, int numberOfSlots, int pageSize, // 内存管理器分发页的大小
 							MemoryType memoryType, boolean preAllocateMemory) {
 		// sanity checks
 		if (memoryType == null) {

@@ -40,15 +40,15 @@ import java.nio.ReadOnlyBufferException;
  * <p>This class fulfills conceptually a similar purpose as Java's {@link java.nio.ByteBuffer}.
  * We add this specialized class for various reasons:
  * <ul>
- *     <li>It offers additional binary compare, swap, and copy methods.</li>
- *     <li>It uses collapsed checks for range check and memory segment disposal.</li>
+ *     <li>It offers additional binary compare, swap, and copy methods.</li> 提供了额外的二进制比较,交换和复制方法
+ *     <li>It uses collapsed checks for range check and memory segment disposal.</li> // 使用折叠检查进行范围检查和内存片段处理
  *     <li>It offers absolute positioning methods for bulk put/get methods, to guarantee
- *         thread safe use.</li>
+ *         thread safe use.</li> // 为bulk get/put提供了绝对的定位方法,以保证线程的安全使用
  *     <li>It offers explicit big-endian / little-endian access methods, rather than tracking internally
- *         a byte order.</li>
- *     <li>It transparently and efficiently moves data between on-heap and off-heap variants.</li>
+ *         a byte order.</li> // 提供显示的大端和小端访问方法,而不是在内部跟踪字节顺序
+ *     <li>It transparently and efficiently moves data between on-heap and off-heap variants.</li> // 透明而高效的在堆内好堆外变量之间移动数据
  * </ul>
- *
+ * // 大量的使用本地指令支持的操作,以实现高效的操作.多字节类型是用unsafe本地命令读写的
  * <p><i>Comments on the implementation</i>:
  * We make heavy use of operations that are supported by native
  * instructions, to achieve a high efficiency. Multi byte types (int, long, float, double, ...)

@@ -48,8 +48,8 @@ import org.apache.flink.util.InstantiationUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-/**
+/**优化器采用用户指定的program plan并创建一个优化的计划,该计划包含有关如何进行物理执行计划的准确描述
+ * 首先将用户程序转换为内部优化器表示,然后再不同的传输策略和本地策略之间进行选择
  * The optimizer that takes the user specified program plan and creates an optimized plan that contains
  * exact descriptions about how the physical execution will take place. It first translates the user
  * program into an internal optimizer representation and then chooses between different alternatives
@@ -58,7 +58,7 @@ import org.slf4j.LoggerFactory;
  * The basic principle is taken from optimizer works in systems such as Volcano/Cascades and Selinger/System-R/DB2. The
  * optimizer walks from the sinks down, generating interesting properties, and ascends from the sources generating
  * alternative plans, pruning against the interesting properties.
- * <p>
+ * <p> 所有需要内存的子任务都会得到相等的内存份额
  * The optimizer also assigns the memory to the individual tasks. This is currently done in a very simple fashion: All
  * sub-tasks that need memory (e.g. reduce or join) are given an equal share of memory.
  */
@@ -444,11 +444,11 @@ public class Optimizer {
 
 		// the first step in the compilation is to create the optimizer plan representation
 		// this step does the following:
-		// 1) It creates an optimizer plan node for each operator
-		// 2) It connects them via channels
-		// 3) It looks for hints about local strategies and channel types and
+		// 1) It creates an optimizer plan node for each operator 				// 为每个operator创建一个optimizer plan节点
+		// 2) It connects them via channels 					  				// 通过channels连接node
+		// 3) It looks for hints about local strategies and channel types and 	// 查找本地策略和channel类型的提示,并相应的设置类型和策略
 		// sets the types and strategies accordingly
-		// 4) It makes estimates about the data volume of the data sources and
+		// 4) It makes estimates about the data volume of the data sources and	// 对数据源的数据量进行估计并通过plan进行传播这些估计值
 		// propagates those estimates through the plan
 
 		GraphCreatingVisitor graphCreator = new GraphCreatingVisitor(defaultParallelism, defaultDataExchangeMode);
@@ -491,13 +491,13 @@ public class Optimizer {
 		// Propagate the interesting properties top-down through the graph
 		InterestingPropertyVisitor propsVisitor = new InterestingPropertyVisitor(this.costEstimator);
 		rootNode.accept(propsVisitor);
-		
+		// 执行健全性检查,root{DataSinkNode}不能任何未关闭的分支
 		// perform a sanity check: the root may not have any unclosed branches
 		if (rootNode.getOpenBranches() != null && rootNode.getOpenBranches().size() > 0) {
 			throw new CompilerException("Bug: Logic for branching plans (non-tree plans) has an error, and does not " +
 					"track the re-joining of branches correctly.");
 		}
-
+		// 最后一步是生成实际的计划替代方案,生成Execution Plan,XXPlanNode--Channel--XXPlanNode--Channel....
 		// the final step is now to generate the actual plan alternatives
 		List<PlanNode> bestPlan = rootNode.getAlternativePlans(this.costEstimator);
 
@@ -515,7 +515,7 @@ public class Optimizer {
 		} else if (bestPlanRoot instanceof SinkJoinerPlanNode) {
 			((SinkJoinerPlanNode) bestPlanRoot).getDataSinks(bestPlanSinks);
 		}
-
+		// 最后的确定计划
 		// finalize the plan
 		OptimizedPlan plan = new PlanFinalizer().createFinalPlan(bestPlanSinks, program.getJobName(), program);
 		

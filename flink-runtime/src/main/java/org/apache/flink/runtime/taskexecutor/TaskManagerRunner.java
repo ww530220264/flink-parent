@@ -366,7 +366,7 @@ public class TaskManagerRunner implements FatalErrorHandler, AutoCloseableAsync 
 			taskManagerServicesConfiguration,
 			resourceID,
 			rpcService.getExecutor(), // TODO replace this later with some dedicated executor for io.
-			EnvironmentInformation.getSizeOfFreeHeapMemoryWithDefrag(),
+			EnvironmentInformation.getSizeOfFreeHeapMemoryWithDefrag(), // 获取可用堆内存大小的估计值
 			EnvironmentInformation.getMaxJvmHeapMemory());
 
 		TaskManagerMetricGroup taskManagerMetricGroup = MetricUtils.instantiateTaskManagerMetricGroup(

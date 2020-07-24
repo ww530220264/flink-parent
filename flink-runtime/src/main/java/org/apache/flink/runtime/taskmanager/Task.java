@@ -119,7 +119,7 @@ import static org.apache.flink.util.Preconditions.checkState;
  * the task's configuration, and the IDs of the intermediate results to consume and
  * produce (if any).
  *
- * <p>Each Task is run by one dedicated thread.
+ * <p>Each Task is run by one dedicated thread. // 每个任务被一个专门的线程运行
  */
 public class Task implements Runnable, TaskActions, CheckpointListener {
 

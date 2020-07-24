@@ -179,7 +179,7 @@ public class DataSinkNode extends OptimizerNode {
 	}
 
 	// --------------------------------------------------------------------------------------------
-	//                                   Recursive Optimization
+	//                                   Recursive Optimization--递归优化
 	// --------------------------------------------------------------------------------------------
 	
 	@Override
@@ -188,7 +188,7 @@ public class DataSinkNode extends OptimizerNode {
 		if (this.cachedPlans != null) {
 			return this.cachedPlans;
 		}
-		
+		// 计算前置任务的替代自己和
 		// calculate alternative sub-plans for predecessor
 		List<? extends PlanNode> subPlans = getPredecessorNode().getAlternativePlans(estimator);
 		List<PlanNode> outputPlans = new ArrayList<PlanNode>();
