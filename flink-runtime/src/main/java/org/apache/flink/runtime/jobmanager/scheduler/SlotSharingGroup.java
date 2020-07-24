@@ -26,7 +26,7 @@ import org.apache.flink.runtime.instance.SlotSharingGroupAssignment;
 import org.apache.flink.runtime.instance.SlotSharingGroupId;
 import org.apache.flink.runtime.jobgraph.JobVertexID;
 
-/**
+/**共享slot单元: 一个job中不同的顶点的不同的tasks可以被部署在一个slot上
  * A slot sharing units defines which different task (from different job vertices) can be
  * deployed together within a slot. This is a soft permission, in contrast to the hard constraint
  * defined by a co-location hint.

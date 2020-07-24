@@ -784,13 +784,13 @@ under the License.
 								<skip>true</skip>
 							</configuration>
 						</plugin>
-						<plugin>
-							<groupId>org.apache.maven.plugins</groupId>
-							<artifactId>maven-checkstyle-plugin</artifactId>
-							<configuration>
-								<skip>true</skip>
-							</configuration>
-						</plugin>
+<!--						<plugin>-->
+<!--							<groupId>org.apache.maven.plugins</groupId>-->
+<!--							<artifactId>maven-checkstyle-plugin</artifactId>-->
+<!--							<configuration>-->
+<!--								<skip>true</skip>-->
+<!--							</configuration>-->
+<!--						</plugin>-->
 						<plugin>
 							<groupId>org.scalastyle</groupId>
 							<artifactId>scalastyle-maven-plugin</artifactId>
@@ -1341,10 +1341,10 @@ under the License.
 					</excludes>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-			</plugin>
+<!--			<plugin>-->
+<!--				<groupId>org.apache.maven.plugins</groupId>-->
+<!--				<artifactId>maven-checkstyle-plugin</artifactId>-->
+<!--			</plugin>-->
 			<plugin>
 				<!-- just define the Java version to be used for compiling and plugins -->
 				<groupId>org.apache.maven.plugins</groupId>
@@ -1558,35 +1558,35 @@ under the License.
 		<pluginManagement>
 			<plugins>
 
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-checkstyle-plugin</artifactId>
-					<version>2.17</version>
-					<dependencies>
-						<dependency>
-							<groupId>com.puppycrawl.tools</groupId>
-							<artifactId>checkstyle</artifactId>
-							<!-- Note: match version with docs/flinkDev/ide_setup.md -->
-							<version>8.9</version>
-						</dependency>
-					</dependencies>
-					<executions>
-						<execution>
-							<id>validate</id>
-							<phase>validate</phase>
-							<goals>
-								<goal>check</goal>
-							</goals>
-						</execution>
-					</executions>
-					<configuration>
-						<suppressionsLocation>/tools/maven/suppressions.xml</suppressionsLocation>
-						<includeTestSourceDirectory>true</includeTestSourceDirectory>
-						<configLocation>/tools/maven/checkstyle.xml</configLocation>
-						<logViolationsToConsole>true</logViolationsToConsole>
-						<failOnViolation>true</failOnViolation>
-					</configuration>
-				</plugin>
+<!--				<plugin>-->
+<!--					<groupId>org.apache.maven.plugins</groupId>-->
+<!--					<artifactId>maven-checkstyle-plugin</artifactId>-->
+<!--					<version>2.17</version>-->
+<!--					<dependencies>-->
+<!--						<dependency>-->
+<!--							<groupId>com.puppycrawl.tools</groupId>-->
+<!--							<artifactId>checkstyle</artifactId>-->
+<!--							&lt;!&ndash; Note: match version with docs/flinkDev/ide_setup.md &ndash;&gt;-->
+<!--							<version>8.9</version>-->
+<!--						</dependency>-->
+<!--					</dependencies>-->
+<!--					<executions>-->
+<!--						<execution>-->
+<!--							<id>validate</id>-->
+<!--							<phase>validate</phase>-->
+<!--							<goals>-->
+<!--								<goal>check</goal>-->
+<!--							</goals>-->
+<!--						</execution>-->
+<!--					</executions>-->
+<!--					<configuration>-->
+<!--						<suppressionsLocation>/tools/maven/suppressions.xml</suppressionsLocation>-->
+<!--						<includeTestSourceDirectory>true</includeTestSourceDirectory>-->
+<!--						<configLocation>/tools/maven/checkstyle.xml</configLocation>-->
+<!--						<logViolationsToConsole>true</logViolationsToConsole>-->
+<!--						<failOnViolation>true</failOnViolation>-->
+<!--					</configuration>-->
+<!--				</plugin>-->
 				
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -1647,19 +1647,19 @@ under the License.
 										<ignore/>
 									</action>
 								</pluginExecution>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.apache.maven.plugins</groupId>
-										<artifactId>maven-checkstyle-plugin</artifactId>
-										<versionRange>[2.12.1,)</versionRange>
-										<goals>
-											<goal>check</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore />
-									</action>
-								</pluginExecution>
+<!--								<pluginExecution>-->
+<!--									<pluginExecutionFilter>-->
+<!--										<groupId>org.apache.maven.plugins</groupId>-->
+<!--										<artifactId>maven-checkstyle-plugin</artifactId>-->
+<!--										<versionRange>[2.12.1,)</versionRange>-->
+<!--										<goals>-->
+<!--											<goal>check</goal>-->
+<!--										</goals>-->
+<!--									</pluginExecutionFilter>-->
+<!--									<action>-->
+<!--										<ignore />-->
+<!--									</action>-->
+<!--								</pluginExecution>-->
 								<pluginExecution>
 									<pluginExecutionFilter>
 										<groupId>org.apache.maven.plugins</groupId>

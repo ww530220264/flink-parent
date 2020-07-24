@@ -77,14 +77,14 @@ under the License.
 	<!-- Because flink-tests needs the CompilerTestBsae -->
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
+<!--			<plugin>-->
+<!--				<groupId>org.apache.maven.plugins</groupId>-->
+<!--				<artifactId>maven-checkstyle-plugin</artifactId>-->
 
-				<configuration>
-					<suppressionsLocation combine.self="override">/tools/maven/suppressions-optimizer.xml</suppressionsLocation>
-				</configuration>
-			</plugin>
+<!--				<configuration>-->
+<!--					<suppressionsLocation combine.self="override">/tools/maven/suppressions-optimizer.xml</suppressionsLocation>-->
+<!--				</configuration>-->
+<!--			</plugin>-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>

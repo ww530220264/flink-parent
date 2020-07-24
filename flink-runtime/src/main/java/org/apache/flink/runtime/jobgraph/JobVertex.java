@@ -65,19 +65,19 @@ public class JobVertex implements java.io.Serializable {
 	/** List of edges with incoming data. One per Reader. */
 	private final ArrayList<JobEdge> inputs = new ArrayList<JobEdge>();
 
-	/** Number of subtasks to split this task into at runtime.*/
+	/** Number of subtasks to split this task into at runtime.*/ // 子任务数量
 	private int parallelism = ExecutionConfig.PARALLELISM_DEFAULT;
 
-	/** Maximum number of subtasks to split this task into a runtime. */
+	/** Maximum number of subtasks to split this task into a runtime. */ // 最大子任务数量
 	private int maxParallelism = -1;
 
 	/** The minimum resource of the vertex */
-	private ResourceSpec minResources = ResourceSpec.DEFAULT;
+	private ResourceSpec minResources = ResourceSpec.DEFAULT; // 这个顶点的最小资源
 
 	/** The preferred resource of the vertex */
-	private ResourceSpec preferredResources = ResourceSpec.DEFAULT;
+	private ResourceSpec preferredResources = ResourceSpec.DEFAULT; // 顶点的首选资源
 
-	/** Custom configuration passed to the assigned task at runtime. */
+	/** Custom configuration passed to the assigned task at runtime. */ // 自定义配置项
 	private Configuration configuration;
 
 	/** The class of the invokable. */

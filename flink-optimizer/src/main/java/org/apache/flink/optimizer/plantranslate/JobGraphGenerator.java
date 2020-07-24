@@ -302,7 +302,7 @@ public class JobGraphGenerator implements Visitor<PlanNode> {
 		}
 	}
 
-	/**
+	/**深度优先遍历,创建job顶点和设置本地策略
 	 * This methods implements the pre-visiting during a depth-first traversal. It create the job vertex and
 	 * sets local strategy.
 	 * 
@@ -323,7 +323,7 @@ public class JobGraphGenerator implements Visitor<PlanNode> {
 		final JobVertex vertex;
 		try {
 			if (node instanceof SinkPlanNode) {
-				vertex = createDataSinkVertex((SinkPlanNode) node);
+				vertex = createDataSinkVertex((SinkPlanNode) node); // 创建DataSink顶点
 			}
 			else if (node instanceof SourcePlanNode) {
 				vertex = createDataSourceVertex((SourcePlanNode) node);
@@ -903,6 +903,7 @@ public class JobGraphGenerator implements Visitor<PlanNode> {
 			config.setDriverComparator(node.getComparator(i), i);
 		}
 		// assign memory, file-handles, etc.
+
 		assignDriverResources(node, config);
 		return vertex;
 	}
