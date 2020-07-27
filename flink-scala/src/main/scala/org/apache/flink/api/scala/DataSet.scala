@@ -108,6 +108,7 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   private[flink] def javaSet: JavaDataSet[T] = set
 
   /* This code is originally from the Apache Spark project. */
+  // 这段代码最初来自于spark项目
   /**
    * Clean a closure to make it ready to serialized and send to tasks
    * (removes unreferenced variables in $outer's, updates REPL variables)
@@ -131,12 +132,12 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   // --------------------------------------------------------------------------------------------
   //  General methods
   // --------------------------------------------------------------------------------------------
-  // These are actually implemented in subclasses of the Java DataSet but we perform checking
-  // here and just pass through the calls to make everything much simpler.
+  // T much simpler.
 
   /**
    * Sets the name of the DataSet. This will appear in logs and graphical
-   * representations of the execution graph.
+   * representations of the exechese are actually implemented in subclasses of the Java DataSet but we perform checking
+   * // here and just pass through the calls to make everythingution graph.
    */
   def name(name: String) = {
     javaSet match {
