@@ -1232,6 +1232,7 @@ class JobManager(
         // because this makes sure that the uploaded jar files are removed in case of
         // unsuccessful
         try {
+          // library registration
           libraryCacheManager.registerJob(
             jobGraph.getJobID, jobGraph.getUserJarBlobKeys, jobGraph.getClasspaths)
         }
@@ -1250,12 +1251,12 @@ class JobManager(
         if (jobGraph.getNumberOfVertices == 0) {
           throw new JobSubmissionException(jobId, "The given job is empty")
         }
-
+        // 重启策略配置
         val restartStrategyConfiguration = jobGraph
           .getSerializedExecutionConfig
           .deserializeValue(userCodeLoader)
           .getRestartStrategy
-
+        // 重启策略
         val restartStrategy = RestartStrategyResolving
           .resolve(restartStrategyConfiguration,
             restartStrategyFactory,
@@ -1264,7 +1265,7 @@ class JobManager(
         log.info(s"Using restart strategy $restartStrategy for $jobId.")
 
         val jobMetrics = jobManagerMetricGroup.addJob(jobGraph)
-
+        // 获取总的slot数量
         val numSlots = scheduler.getTotalNumberOfSlots()
 
         // see if there already exists an ExecutionGraph for the corresponding job ID

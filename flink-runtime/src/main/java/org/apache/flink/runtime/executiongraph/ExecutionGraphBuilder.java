@@ -175,7 +175,7 @@ public class ExecutionGraphBuilder {
 		}
 
 		// set the basic properties
-
+		// 调度模式
 		executionGraph.setScheduleMode(jobGraph.getScheduleMode());
 		executionGraph.setQueuedSchedulingAllowed(jobGraph.getAllowQueuedScheduling());
 

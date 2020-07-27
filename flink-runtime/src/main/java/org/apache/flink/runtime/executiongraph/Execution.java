@@ -412,6 +412,7 @@ public class Execution implements AccessExecution, Archiveable<ArchivedExecution
 			@Nonnull Set<AllocationID> allPreviousExecutionGraphAllocationIds) {
 		final Time allocationTimeout = vertex.getExecutionGraph().getAllocationTimeout();
 		try {
+			// 先申请资源
 			final CompletableFuture<Execution> allocationFuture = allocateAndAssignSlotForExecution(
 				slotProvider,
 				queued,
@@ -422,6 +423,7 @@ public class Execution implements AccessExecution, Archiveable<ArchivedExecution
 			// IMPORTANT: We have to use the synchronous handle operation (direct executor) here so
 			// that we directly deploy the tasks if the slot allocation future is completed. This is
 			// necessary for immediate deployment.
+			// 申请资源完成之后,部署任务
 			final CompletableFuture<Void> deploymentFuture = allocationFuture.thenAccept(
 				(FutureConsumerWithException<Execution, Exception>) value -> deploy());
 
@@ -501,7 +503,7 @@ public class Execution implements AccessExecution, Archiveable<ArchivedExecution
 			Collection<AllocationID> previousAllocationIDs =
 				lastAllocation != null ? Collections.singletonList(lastAllocation) : Collections.emptyList();
 
-			// calculate the preferred locations
+			// calculate the preferred locations // 根据位置首选项的约束计算首选位置
 			final CompletableFuture<Collection<TaskManagerLocation>> preferredLocationsFuture =
 				calculatePreferredLocations(locationPreferenceConstraint);
 

@@ -34,13 +34,13 @@ import java.util.UUID;
  * registries, as well as distributed counters and leader election.
  * 
  * <ul>
- *     <li>ResourceManager leader election and leader retrieval</li>
- *     <li>JobManager leader election and leader retrieval</li>
- *     <li>Persistence for checkpoint metadata</li>
- *     <li>Registering the latest completed checkpoint(s)</li>
- *     <li>Persistence for the BLOB store</li>
- *     <li>Registry that marks a job's status</li>
- *     <li>Naming of RPC endpoints</li>
+ *     <li>ResourceManager leader election and leader retrieval</li> // 资源管理器leader选举和查询哪个是leader
+ *     <li>JobManager leader election and leader retrieval</li> // JobManagerleader选举和查询哪个是leader
+ *     <li>Persistence for checkpoint metadata</li> // checkpoint元数据的持久化
+ *     <li>Registering the latest completed checkpoint(s)</li> // 注册最近完成的checkpoints
+ *     <li>Persistence for the BLOB store</li> // 持久化BLOB存储
+ *     <li>Registry that marks a job's status</li> // 标记job的状态的注册
+ *     <li>Naming of RPC endpoints</li> // endpoints的命名
  * </ul>
  */
 public interface HighAvailabilityServices extends AutoCloseable {

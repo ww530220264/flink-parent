@@ -464,6 +464,7 @@ public abstract class ClusterClient<T> {
 	 *                                    i.e. the job-manager is unreachable, or due to the fact that the
 	 *                                    parallel execution failed.
 	 */
+	// 在该client连接的集群上运行program,本次调用一直阻塞到执行完成
 	public JobSubmissionResult run(JobWithJars jobWithJars, int parallelism, SavepointRestoreSettings savepointSettings)
 			throws CompilerException, ProgramInvocationException {
 		ClassLoader classLoader = jobWithJars.getUserCodeClassLoader();
@@ -495,7 +496,7 @@ public abstract class ClusterClient<T> {
 	 * @throws ProgramInvocationException
 	 */
 	public JobExecutionResult run(JobGraph jobGraph, ClassLoader classLoader) throws ProgramInvocationException {
-
+		// 阻塞直到所有的TaskManager都已连接
 		waitForClusterToBeReady();
 
 		final ActorSystem actorSystem;

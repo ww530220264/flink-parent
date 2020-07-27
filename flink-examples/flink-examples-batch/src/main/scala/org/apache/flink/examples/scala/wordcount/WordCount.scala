@@ -62,7 +62,7 @@ object WordCount {
         println("Use --input to specify file input.")
         env.fromCollection(WordCountData.WORDS)
       }
-
+    env.setParallelism(2)
     val counts = text.flatMap { _.toLowerCase.split("\\W+") filter { _.nonEmpty } }
       .map { (_, 1) }
       .groupBy(0)

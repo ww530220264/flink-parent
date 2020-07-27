@@ -163,7 +163,7 @@ public class RemoteEnvironment extends ExecutionEnvironment {
 	@Override
 	public JobExecutionResult execute(String jobName) throws Exception {
 		PlanExecutor executor = getExecutor();
-
+		// 创建program'plan
 		Plan p = createProgramPlan(jobName);
 
 		// Session management is disabled, revert this commit to enable
@@ -206,11 +206,12 @@ public class RemoteEnvironment extends ExecutionEnvironment {
 
 	protected PlanExecutor getExecutor() throws Exception {
 		if (executor == null) {
+			// 创建RemoteExecutor,用来获取程序并将程序传输到远程集群
 			executor = PlanExecutor.createRemoteExecutor(host, port, clientConfiguration,
 				jarFiles, globalClasspaths);
 			executor.setPrintStatusDuringExecution(getConfig().isSysoutLoggingEnabled());
 		}
-
+		// 如果使用session模式,需要保持Executor一直运行
 		// if we are using sessions, we keep the executor running
 		if (getSessionTimeout() > 0 && !executor.isRunning()) {
 			executor.start();

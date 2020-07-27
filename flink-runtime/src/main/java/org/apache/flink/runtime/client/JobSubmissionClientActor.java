@@ -155,6 +155,7 @@ public class JobSubmissionClientActor extends JobClientActor {
 		final CompletableFuture<Void> jarUploadFuture = blobServerAddressFuture.thenAcceptAsync(
 			(InetSocketAddress blobServerAddress) -> {
 				try {
+					// 从jobGraph中获取执行所需的各种文件,并通过BlobClient上传
 					ClientUtils.extractAndUploadJobGraphFiles(jobGraph, () -> new BlobClient(blobServerAddress, clientConfig));
 				} catch (FlinkException e) {
 					throw new CompletionException(e);
@@ -166,12 +167,12 @@ public class JobSubmissionClientActor extends JobClientActor {
 			.thenAccept(
 				(Void ignored) -> {
 					LOG.info("Submit job to the job manager {}.", jobManager.path());
-
+					// 提交job到JobManager
 					jobManager.tell(
 						decorateMessage(
 							new JobManagerMessages.SubmitJob(
-								jobGraph,
-								ListeningBehaviour.EXECUTION_RESULT_AND_STATE_CHANGES)),
+								jobGraph, // 待提交的job
+								ListeningBehaviour.EXECUTION_RESULT_AND_STATE_CHANGES)), // 执行发送者希望监听的事件
 						getSelf());
 
 					// issue a SubmissionTimeout message to check that we submit the job within

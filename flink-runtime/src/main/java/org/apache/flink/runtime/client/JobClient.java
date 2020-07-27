@@ -369,9 +369,9 @@ public class JobClient {
 	 *                                                               execution fails.
 	 */
 	public static JobExecutionResult submitJobAndWait(
-			ActorSystem actorSystem,
-			Configuration config,
-			HighAvailabilityServices highAvailabilityServices,
+			ActorSystem actorSystem, // 用于通信
+			Configuration config, // 集群端配置
+			HighAvailabilityServices highAvailabilityServices, // 高可用服务
 			JobGraph jobGraph,
 			FiniteDuration timeout,
 			boolean sysoutLogUpdates,

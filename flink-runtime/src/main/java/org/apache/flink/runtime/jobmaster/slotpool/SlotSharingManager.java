@@ -49,7 +49,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
-/**
+/**共享slot运行在同一个slot上运行不同的tasks
  * Manager which is responsible for slot sharing. Slot sharing allows to run different
  * tasks in the same slot and to realize co-location constraints.
  *

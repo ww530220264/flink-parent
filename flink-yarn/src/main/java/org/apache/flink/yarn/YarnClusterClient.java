@@ -245,7 +245,7 @@ public class YarnClusterClient extends ClusterClient<ApplicationId> {
 		logAndSysout("Waiting until all TaskManagers have connected");
 
 		for (GetClusterStatusResponse currentStatus, lastStatus = null; true; lastStatus = currentStatus) {
-			currentStatus = getClusterStatus();
+			currentStatus = getClusterStatus(); // 获取集群当前状态
 			if (currentStatus != null && !currentStatus.equals(lastStatus)) {
 				logAndSysout("TaskManager status (" + currentStatus.numRegisteredTaskManagers() + "/"
 					+ numberTaskManagers + ")");
