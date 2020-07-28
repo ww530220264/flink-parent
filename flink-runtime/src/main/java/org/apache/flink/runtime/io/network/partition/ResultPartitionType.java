@@ -19,7 +19,7 @@
 package org.apache.flink.runtime.io.network.partition;
 
 /**
- * Type of a result partition.
+ * Type of a result partition.结果分区的类型
  */
 public enum ResultPartitionType {
 
