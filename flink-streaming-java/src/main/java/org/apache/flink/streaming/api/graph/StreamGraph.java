@@ -419,7 +419,7 @@ public class StreamGraph extends StreamingPlan {
 		} else {
 			StreamNode upstreamNode = getStreamNode(upStreamVertexID);
 			StreamNode downstreamNode = getStreamNode(downStreamVertexID);
-
+			// 如果没有指定分区器且上游的并行数==下游的并行数,则使用forward 分区,否则使用rebalance分区器
 			// If no partitioner was specified and the parallelism of upstream and downstream
 			// operator matches use forward partitioning, use rebalance otherwise.
 			if (partitioner == null && upstreamNode.getParallelism() == downstreamNode.getParallelism()) {

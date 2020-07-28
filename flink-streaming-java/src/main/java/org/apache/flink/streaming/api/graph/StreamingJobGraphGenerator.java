@@ -227,9 +227,9 @@ public class StreamingJobGraphGenerator {
 
 			for (StreamEdge outEdge : streamGraph.getStreamNode(currentNodeId).getOutEdges()) {
 				if (isChainable(outEdge, streamGraph)) {
-					chainableOutputs.add(outEdge);
+					chainableOutputs.add(outEdge); // 可以被连接的edge
 				} else {
-					nonChainableOutputs.add(outEdge);
+					nonChainableOutputs.add(outEdge);	// 不可以被连接的edge
 				}
 			}
 
@@ -523,16 +523,16 @@ public class StreamingJobGraphGenerator {
 		StreamOperator<?> headOperator = upStreamVertex.getOperator();
 		StreamOperator<?> outOperator = downStreamVertex.getOperator();
 
-		return downStreamVertex.getInEdges().size() == 1
-				&& outOperator != null
-				&& headOperator != null
-				&& upStreamVertex.isSameSlotSharingGroup(downStreamVertex)
-				&& outOperator.getChainingStrategy() == ChainingStrategy.ALWAYS
-				&& (headOperator.getChainingStrategy() == ChainingStrategy.HEAD ||
+		return downStreamVertex.getInEdges().size() == 1 // 下游节点的输入只有一条边
+				&& outOperator != null	// 下游节点Operator不为空
+				&& headOperator != null	// 上游节点Operator不为看看
+				&& upStreamVertex.isSameSlotSharingGroup(downStreamVertex)	// 上游节点和下游节点是相同的slot共享组
+				&& outOperator.getChainingStrategy() == ChainingStrategy.ALWAYS	// 下游节点的连接策略是ALWAYS
+				&& (headOperator.getChainingStrategy() == ChainingStrategy.HEAD ||	// 上游节点的连接策略是HEAD或者ALWAYS
 					headOperator.getChainingStrategy() == ChainingStrategy.ALWAYS)
-				&& (edge.getPartitioner() instanceof ForwardPartitioner)
-				&& upStreamVertex.getParallelism() == downStreamVertex.getParallelism()
-				&& streamGraph.isChainingEnabled();
+				&& (edge.getPartitioner() instanceof ForwardPartitioner)	// 边的分区器是ForwardPartitioner类型
+				&& upStreamVertex.getParallelism() == downStreamVertex.getParallelism()	// 上游节点的并行度和下游节点的并行度相同
+				&& streamGraph.isChainingEnabled();	// streamGraph是可连接的
 	}
 
 	private void setSlotSharingAndCoLocation() {
