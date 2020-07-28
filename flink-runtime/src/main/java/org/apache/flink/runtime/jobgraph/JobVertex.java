@@ -465,9 +465,9 @@ public class JobVertex implements java.io.Serializable {
 			JobVertex input,
 			DistributionPattern distPattern,
 			ResultPartitionType partitionType) {
-
+		// 试用上游JobVertex创建中间结果DataSet
 		IntermediateDataSet dataSet = input.createAndAddResultDataSet(partitionType);
-
+		// 创建JobEdge连接中间结果和当前JobVertex
 		JobEdge edge = new JobEdge(dataSet, this, distPattern);
 		this.inputs.add(edge);
 		dataSet.addConsumer(edge);
