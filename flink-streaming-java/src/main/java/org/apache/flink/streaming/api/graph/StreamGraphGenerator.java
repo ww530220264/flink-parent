@@ -200,7 +200,7 @@ public class StreamGraphGenerator {
 		if (transform.getUid() != null) {
 			streamGraph.setTransformationUID(transform.getId(), transform.getUid());
 		}
-		if (transform.getUserProvidedNodeHash() != null) {
+		if (transform.getUserProvidedNodeHash() != null) { // 设置用户设置的node hash值
 			streamGraph.setTransformationUserHash(transform.getId(), transform.getUserProvidedNodeHash());
 		}
 
@@ -241,7 +241,7 @@ public class StreamGraphGenerator {
 		Collection<Integer> transformedIds = transform(input);
 		for (Integer transformedId: transformedIds) {
 			int virtualId = StreamTransformation.getNewNodeId();
-			streamGraph.addVirtualPartitionNode(transformedId, virtualId, partition.getPartitioner());
+			streamGraph.addVirtualPartitionNode(transformedId, virtualId, partition.getPartitioner()); // 添加虚拟分区节点
 			resultIds.add(virtualId);
 		}
 

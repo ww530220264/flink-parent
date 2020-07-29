@@ -141,20 +141,20 @@ public class StreamingJobGraphGenerator {
 		jobGraph.setScheduleMode(ScheduleMode.EAGER);
 
 		// Generate deterministic hashes for the nodes in order to identify them across
-		// submission iff they didn't change.
+		// submission iff they didn't change.为每个节点生成确定的hash值
 		Map<Integer, byte[]> hashes = defaultStreamGraphHasher.traverseStreamGraphAndGenerateHashes(streamGraph);
 
-		// Generate legacy version hashes for backwards compatibility
+		// Generate legacy version hashes for backwards compatibility // 为向后兼容生成遗留版本的hash值
 		List<Map<Integer, byte[]>> legacyHashes = new ArrayList<>(legacyStreamGraphHashers.size());
 		for (StreamGraphHasher hasher : legacyStreamGraphHashers) {
 			legacyHashes.add(hasher.traverseStreamGraphAndGenerateHashes(streamGraph));
 		}
 
 		Map<Integer, List<Tuple2<byte[], byte[]>>> chainedOperatorHashes = new HashMap<>();
-
+		// 从source开始建立task chains && 递归创建所有的JobVertex,每个task chain,使用头结点创建一个JobVertex
 		setChaining(hashes, legacyHashes, chainedOperatorHashes);
 
-		setPhysicalEdges();
+		setPhysicalEdges(); // 设置相关JobEdge的下游节点信息
 
 		setSlotSharingAndCoLocation();
 
@@ -199,9 +199,9 @@ public class StreamingJobGraphGenerator {
 		}
 	}
 
-	/**
+	/**从source开始建立task chains
 	 * Sets up task chains from the source {@link StreamNode} instances.
-	 *
+	 * 递归创建所有的JobVertex
 	 * <p>This will recursively create all {@link JobVertex} instances.
 	 */
 	private void setChaining(Map<Integer, byte[]> hashes, List<Map<Integer, byte[]>> legacyHashes, Map<Integer, List<Tuple2<byte[], byte[]>>> chainedOperatorHashes) {
@@ -269,9 +269,9 @@ public class StreamingJobGraphGenerator {
 				config.setOperatorName(streamGraph.getStreamNode(currentNodeId).getOperatorName());
 				config.setOutEdgesInOrder(transitiveOutEdges);
 				config.setOutEdges(streamGraph.getStreamNode(currentNodeId).getOutEdges());
-
+				// 当前StreamNode是所在task chain的头结点  将当前JobVertex与下一个JobVertex通过中间结果集并创建JobEdge连接
 				for (StreamEdge edge : transitiveOutEdges) {
-					connect(startNodeId, edge);
+					connect(startNodeId, edge); // curJobVertex----dataSet----JobEdge----nextJobVertex
 				}
 
 				config.setTransitiveChainedTaskConfigs(chainedConfigs.get(startNodeId));
@@ -380,10 +380,10 @@ public class StreamingJobGraphGenerator {
 		} else {
 			jobVertex = new JobVertex(
 					chainedNames.get(streamNodeId),
-					jobVertexId,
-					legacyJobVertexIds,
-					chainedOperatorVertexIds,
-					userDefinedChainedOperatorVertexIds);
+					jobVertexId, // murmur hash产生的hash值 生成的JobVertexId
+					legacyJobVertexIds, // 用户定义的hash值 生成的JobVertexIds
+					chainedOperatorVertexIds, // 链中的各个jobVertexId的值(murmur hash产生的hash值)
+					userDefinedChainedOperatorVertexIds); // 链中的各个jobVertexId(用户定义的hash值 生成的JobVertexIds)
 		}
 
 		jobVertex.setResources(chainedMinResources.get(streamNodeId), chainedPreferredResources.get(streamNodeId));

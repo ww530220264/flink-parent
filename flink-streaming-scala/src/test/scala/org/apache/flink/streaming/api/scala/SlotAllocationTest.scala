@@ -40,22 +40,22 @@ class SlotAllocationTest {
       }
     }
 
-    env.generateSequence(1, 10)
-      .filter(dummyFilter).slotSharingGroup("isolated")
-      .filter(dummyFilter).slotSharingGroup("default").disableChaining()
-      .filter(dummyFilter).slotSharingGroup("group 1")
-      .filter(dummyFilter)
+    env.generateSequence(1, 10) // 1
+      .filter(dummyFilter).slotSharingGroup("isolated") // 7
+      .filter(dummyFilter).slotSharingGroup("default").disableChaining()//8
+      .filter(dummyFilter).slotSharingGroup("group 1") // 9
+      .filter(dummyFilter) // 10
       .startNewChain()
-      .print().disableChaining()
+      .print().disableChaining() // 11
 
     // verify that a second pipeline does not inherit the groups from the first pipeline
-    env.generateSequence(1, 10)
-      .filter(dummyFilter).slotSharingGroup("isolated-2")
-      .filter(dummyFilter).slotSharingGroup("default").disableChaining()
-      .filter(dummyFilter).slotSharingGroup("group 2")
-      .filter(dummyFilter)
+    env.generateSequence(1, 10) // 0
+      .filter(dummyFilter).slotSharingGroup("isolated-2") // 2
+      .filter(dummyFilter).slotSharingGroup("default").disableChaining() // 3
+      .filter(dummyFilter).slotSharingGroup("group 2") // 4
+      .filter(dummyFilter) // 5
       .startNewChain()
-      .print().disableChaining()
+      .print().disableChaining() // 6
 
     val jobGraph: JobGraph = env.getStreamGraph.getJobGraph
 

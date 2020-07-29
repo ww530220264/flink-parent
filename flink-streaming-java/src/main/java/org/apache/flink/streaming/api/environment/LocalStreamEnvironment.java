@@ -85,7 +85,7 @@ public class LocalStreamEnvironment extends StreamExecutionEnvironment {
 	 */
 	@Override
 	public JobExecutionResult execute(String jobName) throws Exception {
-		// transform the streaming program into a JobGraph
+		// transform the streaming program into a JobGraph // 将Stream程序转换为JobGraph
 		StreamGraph streamGraph = getStreamGraph();
 		streamGraph.setJobName(jobName);
 

@@ -340,7 +340,7 @@ public class StreamGraph extends StreamingPlan {
 	/**
 	 * Adds a new virtual node that is used to connect a downstream vertex to an input with a
 	 * certain partitioning.
-	 *
+	 * 当从虚拟节点添加一个edge到一个下游节点时,将会转换为从实际原始节点连接到下游节点,但是会使用给定的分区
 	 * <p>When adding an edge from the virtual node to a downstream node the connection will be made
 	 * to the original node, but with the partitioning given here.
 	 *

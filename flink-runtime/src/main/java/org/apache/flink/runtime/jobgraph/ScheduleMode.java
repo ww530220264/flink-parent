@@ -24,10 +24,10 @@ package org.apache.flink.runtime.jobgraph;
 public enum ScheduleMode {
 
 	/** Schedule tasks lazily from the sources. Downstream tasks are started once their input data are ready */
-	LAZY_FROM_SOURCES,
+	LAZY_FROM_SOURCES, // 懒调度,只有下游任务的输入数据准备好之后才启动
 
 	/** Schedules all tasks immediately. */
-	EAGER;
+	EAGER; // 立即调度所有的任务
 	
 	/**
 	 * Returns whether we are allowed to deploy consumers lazily.

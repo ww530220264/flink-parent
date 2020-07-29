@@ -29,7 +29,7 @@ import java.util.List;
 
 /**
  * This transformation represents a change of partitioning of the input elements.
- *
+ * 不会产生物理操作,只影响上游操作如何连接下游操作
  * <p>This does not create a physical operation, it only affects how upstream operations are
  * connected to downstream operations.
  *

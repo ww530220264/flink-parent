@@ -77,7 +77,7 @@ public class StreamGraphHasherV2 implements StreamGraphHasher {
 	@Override
 	public Map<Integer, byte[]> traverseStreamGraphAndGenerateHashes(StreamGraph streamGraph) {
 		// The hash function used to generate the hash
-		final HashFunction hashFunction = Hashing.murmur3_128(0);
+		final HashFunction hashFunction = Hashing.murmur3_128(0); // murmur hash,生成hash值的工具函数
 		final Map<Integer, byte[]> hashes = new HashMap<>();
 
 		Set<Integer> visited = new HashSet<>();
@@ -86,7 +86,7 @@ public class StreamGraphHasherV2 implements StreamGraphHasher {
 		// We need to make the source order deterministic. The source IDs are
 		// not returned in the same order, which means that submitting the same
 		// program twice might result in different traversal, which breaks the
-		// deterministic hash assignment.
+		// deterministic hash assignment.确定source的顺序
 		List<Integer> sources = new ArrayList<>();
 		for (Integer sourceNodeId : streamGraph.getSourceIDs()) {
 			sources.add(sourceNodeId);
@@ -96,7 +96,7 @@ public class StreamGraphHasherV2 implements StreamGraphHasher {
 		//
 		// Traverse the graph in a breadth-first manner. Keep in mind that
 		// the graph is not a tree and multiple paths to nodes can exist.
-		//
+		// 广度优先遍历方式
 
 		// Start with source nodes
 		for (Integer sourceNodeId : sources) {
@@ -113,7 +113,7 @@ public class StreamGraphHasherV2 implements StreamGraphHasher {
 				// Add the child nodes
 				for (StreamEdge outEdge : currentNode.getOutEdges()) {
 					StreamNode child = outEdge.getTargetVertex();
-
+					// 将子节点添加到队列中等待处理
 					if (!visited.contains(child.getId())) {
 						remaining.add(child);
 						visited.add(child.getId());

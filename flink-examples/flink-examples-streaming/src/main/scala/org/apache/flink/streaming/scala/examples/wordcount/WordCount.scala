@@ -65,9 +65,9 @@ object WordCount {
       println("Executing WordCount example with default inputs data set.")
       println("Use --input to specify file input.")
       // get default test text data
-      env.fromElements(WordCountData.WORDS: _*)
+      env.fromElements(WordCountData.WORDS: _*) // 转为参数序列
     }
-
+    env.setParallelism(2)
     val counts: DataStream[(String, Int)] = text
       // split up the lines in pairs (2-tuples) containing: (word,1)
       .flatMap(_.toLowerCase.split("\\W+"))

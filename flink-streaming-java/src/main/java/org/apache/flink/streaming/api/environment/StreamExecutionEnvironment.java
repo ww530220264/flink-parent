@@ -811,7 +811,7 @@ public abstract class StreamExecutionEnvironment {
 
 		SourceFunction<OUT> function;
 		try {
-			function = new FromElementsFunction<>(typeInfo.createSerializer(getConfig()), data);
+			function = new FromElementsFunction<>(typeInfo.createSerializer(getConfig()), data); // 数据封装在function中了
 		}
 		catch (IOException e) {
 			throw new RuntimeException(e.getMessage(), e);
