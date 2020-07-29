@@ -26,14 +26,14 @@ import org.apache.flink.runtime.executiongraph.ExecutionVertex;
  */
 public enum DistributionPattern {
 
-	/**每个生产子任务与每个消费任务的子任务相连接
+	/**每个生产子任务与每个消费任务的子任务相连接-->多对多
 	 * Each producing sub task is connected to each sub task of the consuming task.
 	 * <p>
 	 * {@link ExecutionVertex#connectAllToAll(org.apache.flink.runtime.executiongraph.IntermediateResultPartition[], int)}
 	 */
 	ALL_TO_ALL,
 
-	/**每个生产子任务都连接到消费任务的一个或多个子任务
+	/**每个生产子任务都连接到消费任务的一个或多个子任务--一对一或一对多
 	 * Each producing sub task is connected to one or more subtask(s) of the consuming task.
 	 * <p>
 	 * {@link ExecutionVertex#connectPointwise(org.apache.flink.runtime.executiongraph.IntermediateResultPartition[], int)}
