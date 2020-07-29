@@ -154,14 +154,14 @@ public class StreamingJobGraphGenerator {
 		// 从source开始建立task chains && 递归创建所有的JobVertex,每个task chain,使用头结点创建一个JobVertex
 		setChaining(hashes, legacyHashes, chainedOperatorHashes);
 
-		setPhysicalEdges(); // 设置相关JobEdge的下游节点信息
+		setPhysicalEdges(); // 设置相关JobEdge的下游节点信息,物理节点用StreamEdge表示
 
-		setSlotSharingAndCoLocation();
+		setSlotSharingAndCoLocation(); // 给相应的JobVertex设置共享slot
 
-		configureCheckpointing();
-
+		configureCheckpointing(); // 配置checkPoint相关
+		// 添加用户手动指定的内容
 		JobGraphGenerator.addUserArtifactEntries(streamGraph.getEnvironment().getCachedFiles(), jobGraph);
-
+		// 在ExecutionConfig完成后将其最后设置
 		// set the ExecutionConfig last when it has been finalized
 		try {
 			jobGraph.setExecutionConfig(streamGraph.getExecutionConfig());
@@ -551,11 +551,11 @@ public class StreamingJobGraphGenerator {
 			if (slotSharingGroupKey != null) {
 				sharingGroup = slotSharingGroups.computeIfAbsent(
 						slotSharingGroupKey, (k) -> new SlotSharingGroup());
-				vertex.setSlotSharingGroup(sharingGroup);
+				vertex.setSlotSharingGroup(sharingGroup); // 给当前JobVertex设置slotGroup
 			} else {
 				sharingGroup = null;
 			}
-
+			// 配置同一位置的约束
 			// configure co-location constraint
 			final String coLocationGroupKey = node.getCoLocationGroup();
 			if (coLocationGroupKey != null) {
@@ -599,19 +599,19 @@ public class StreamingJobGraphGenerator {
 			executionConfig.setFailTaskOnCheckpointError(cfg.isFailOnCheckpointingErrors());
 		} else {
 			// interval of max value means disable periodic checkpoint
-			interval = Long.MAX_VALUE;
+			interval = Long.MAX_VALUE; // 禁用周期性检查点
 		}
 
 		//  --- configure the participating vertices ---
-
+		// 收集接收"触发检查点"消息的顶点,目前是所有的source
 		// collect the vertices that receive "trigger checkpoint" messages.
 		// currently, these are all the sources
 		List<JobVertexID> triggerVertices = new ArrayList<>();
-
+		// 收集需要确认检查点的JobVertex,目前是所有的JobVertex
 		// collect the vertices that need to acknowledge the checkpoint
 		// currently, these are all vertices
 		List<JobVertexID> ackVertices = new ArrayList<>(jobVertices.size());
-
+		// 收集接收"提交检查点"消息的JobVertex,目前是所有的JobVertex
 		// collect the vertices that receive "commit checkpoint" messages
 		// currently, these are all vertices
 		List<JobVertexID> commitVertices = new ArrayList<>(jobVertices.size());
@@ -627,7 +627,7 @@ public class StreamingJobGraphGenerator {
 		//  --- configure options ---
 
 		CheckpointRetentionPolicy retentionAfterTermination;
-		if (cfg.isExternalizedCheckpointsEnabled()) {
+		if (cfg.isExternalizedCheckpointsEnabled()) { // 检查是检查点否支持在外部持久化
 			CheckpointConfig.ExternalizedCheckpointCleanup cleanup = cfg.getExternalizedCheckpointCleanup();
 			// Sanity check
 			if (cleanup == null) {
