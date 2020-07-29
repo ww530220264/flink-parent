@@ -90,16 +90,16 @@ public class LocalStreamEnvironment extends StreamExecutionEnvironment {
 		streamGraph.setJobName(jobName);
 
 		JobGraph jobGraph = streamGraph.getJobGraph();
-		jobGraph.setAllowQueuedScheduling(true);
+		jobGraph.setAllowQueuedScheduling(true); // 允许排队调度
 
 		Configuration configuration = new Configuration();
 		configuration.addAll(jobGraph.getJobConfiguration());
-		configuration.setString(TaskManagerOptions.MANAGED_MEMORY_SIZE, "0");
+		configuration.setString(TaskManagerOptions.MANAGED_MEMORY_SIZE, "0"); // taskManager内存大小
 
 		// add (and override) the settings with what the user defined
 		configuration.addAll(this.configuration);
 
-		if (!configuration.contains(RestOptions.PORT)) {
+		if (!configuration.contains(RestOptions.PORT)) { // rest.port
 			configuration.setInteger(RestOptions.PORT, 0);
 		}
 
