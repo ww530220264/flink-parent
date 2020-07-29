@@ -259,7 +259,7 @@ public class StreamingJobGraphGenerator {
 			StreamConfig config = currentNodeId.equals(startNodeId)
 					? createJobVertex(startNodeId, hashes, legacyHashes, chainedOperatorHashes)
 					: new StreamConfig(new Configuration());
-
+			// 使用vertex[StreamNode] 填充config
 			setVertexConfig(currentNodeId, config, chainableOutputs, nonChainableOutputs);
 
 			if (currentNodeId.equals(startNodeId)) {
