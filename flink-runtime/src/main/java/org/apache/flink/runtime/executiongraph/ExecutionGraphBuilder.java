@@ -122,8 +122,8 @@ public class ExecutionGraphBuilder {
 	 */
 	@Deprecated
 	public static ExecutionGraph buildGraph(
-			@Nullable ExecutionGraph prior,
-			JobGraph jobGraph,
+			@Nullable ExecutionGraph prior, // 先前的ExecutionGraph
+			JobGraph jobGraph,	// 当前JobGraph
 			Configuration jobManagerConfig,
 			ScheduledExecutorService futureExecutor,
 			Executor ioExecutor,
@@ -180,6 +180,7 @@ public class ExecutionGraphBuilder {
 		executionGraph.setQueuedSchedulingAllowed(jobGraph.getAllowQueuedScheduling());
 
 		try {
+			// 将JobGraph转换为字符串JsonPlan
 			executionGraph.setJsonPlan(JsonPlanGenerator.generatePlan(jobGraph));
 		}
 		catch (Throwable t) {
@@ -229,7 +230,7 @@ public class ExecutionGraphBuilder {
 		if (log.isDebugEnabled()) {
 			log.debug("Adding {} vertices from job graph {} ({}).", sortedTopology.size(), jobName, jobId);
 		}
-		executionGraph.attachJobGraph(sortedTopology);
+		executionGraph.attachJobGraph(sortedTopology); // 关联JobVertex
 
 		if (log.isDebugEnabled()) {
 			log.debug("Successfully created execution graph from job graph {} ({}).", jobName, jobId);
@@ -270,7 +271,7 @@ public class ExecutionGraphBuilder {
 			catch (Exception e) {
 				throw new JobExecutionException(jobId, "Failed to initialize high-availability checkpoint handler", e);
 			}
-
+			// 历史需要记住的checkpoint的最大数量
 			// Maximum number of remembered checkpoints
 			int historySize = jobManagerConfig.getInteger(WebOptions.CHECKPOINTS_HISTORY_SIZE);
 

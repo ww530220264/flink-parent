@@ -495,7 +495,7 @@ public class JobVertex implements java.io.Serializable {
 
 	public boolean hasNoConnectedInputs() {
 		for (JobEdge edge : inputs) {
-			if (!edge.isIdReference()) {
+			if (!edge.isIdReference()) { // 判断edge.source是否为null
 				return false;
 			}
 		}

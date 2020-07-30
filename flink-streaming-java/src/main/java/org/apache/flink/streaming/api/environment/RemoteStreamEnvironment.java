@@ -174,6 +174,7 @@ public class RemoteStreamEnvironment extends StreamExecutionEnvironment {
 		StreamGraph streamGraph = getStreamGraph();
 		streamGraph.setJobName(jobName);
 		transformations.clear();
+		// 远程汇享StreamGraph
 		return executeRemotely(streamGraph, jarFiles);
 	}
 
@@ -204,6 +205,7 @@ public class RemoteStreamEnvironment extends StreamExecutionEnvironment {
 
 		final ClusterClient<?> client;
 		try {
+			// 创建客户端
 			client = new RestClusterClient<>(configuration, "RemoteStreamEnvironment");
 		}
 		catch (Exception e) {

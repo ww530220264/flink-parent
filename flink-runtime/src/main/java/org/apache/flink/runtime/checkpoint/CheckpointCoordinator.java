@@ -67,7 +67,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.apache.flink.util.Preconditions.checkArgument;
 import static org.apache.flink.util.Preconditions.checkNotNull;
 
-/**
+/**检查点协调器:协调operators和state的分布式快照,并通过给相关的tasks发送消息来触发checkpoint并收集checkpoint的确认消息
  * The checkpoint coordinator coordinates the distributed snapshots of operators and state.
  * It triggers the checkpoint by sending the messages to the relevant tasks and collects the
  * checkpoint acknowledgements. It also collects and maintains the overview of the state handles

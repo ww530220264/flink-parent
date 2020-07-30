@@ -124,7 +124,7 @@ public class StreamGraphGenerator {
 		return new StreamGraphGenerator(env).generateInternal(transformations);
 	}
 
-	/**
+	/**根据transformations转换为StreamGraph,节点StreamNode通过StreamEdge连接
 	 * This starts the actual transformation, beginning from the sinks.
 	 */
 	private StreamGraph generateInternal(List<StreamTransformation<?>> transformations) {

@@ -834,7 +834,7 @@ public class ExecutionGraph implements AccessExecutionGraph {
 				rpcTimeout,
 				globalModVersion,
 				createTimestamp);
-
+			// 连接到前置任务
 			ejv.connectToPredecessors(this.intermediateResults);
 
 			ExecutionJobVertex previousTask = this.tasks.putIfAbsent(jobVertex.getID(), ejv);
@@ -863,7 +863,7 @@ public class ExecutionGraph implements AccessExecutionGraph {
 	public void scheduleForExecution() throws JobException {
 
 		final long currentGlobalModVersion = globalModVersion;
-
+		// Job状态转换 CREATED-->RUNNING
 		if (transitionState(JobStatus.CREATED, JobStatus.RUNNING)) {
 
 			final CompletableFuture<Void> newSchedulingFuture;
@@ -933,7 +933,7 @@ public class ExecutionGraph implements AccessExecutionGraph {
 	private CompletableFuture<Void> scheduleEager(SlotProvider slotProvider, final Time timeout) {
 		checkState(state == JobStatus.RUNNING, "job is not running currently");
 
-		// Important: reserve all the space we need up front.
+		// Important: reserve all the space we need up front. 提前准备好需要的空间
 		// that way we do not have any operation that can fail between allocating the slots
 		// and adding them to the list. If we had a failure in between there, that would
 		// cause the slots to get lost

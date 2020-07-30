@@ -120,6 +120,7 @@ public class YarnClusterClient extends ClusterClient<ApplicationId> {
 	private void stopAfterJob(JobID jobID) {
 		Preconditions.checkNotNull(jobID, "The job id must not be null");
 		try {
+			// 告诉JobManager,当该Job结束之后关闭Cluster
 			Future<Object> replyFuture =
 				getJobManagerGateway().ask(
 					new ShutdownClusterAfterJob(jobID),
@@ -149,8 +150,8 @@ public class YarnClusterClient extends ClusterClient<ApplicationId> {
 
 	@Override
 	public JobSubmissionResult submitJob(JobGraph jobGraph, ClassLoader classLoader) throws ProgramInvocationException {
-		if (isDetached()) {
-			if (newlyCreatedCluster) {
+		if (isDetached()) { // 是否是detached模式
+			if (newlyCreatedCluster) { // 是否是一个job一个flink 集群,也就是说不是yarn-session模式
 				stopAfterJob(jobGraph.getJobID());
 			}
 			return super.runDetached(jobGraph, classLoader);

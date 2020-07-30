@@ -410,7 +410,7 @@ public class JobClient {
 		checkNotNull(timeout, "The timeout must not be null.");
 
 		LOG.info("Checking and uploading JAR files");
-
+		// 获取BlobServerAddress
 		final CompletableFuture<InetSocketAddress> blobServerAddressFuture = retrieveBlobServerAddress(
 			jobManagerGateway,
 			timeout);
@@ -424,12 +424,13 @@ public class JobClient {
 		}
 
 		try {
+			// 抽取执行该JobGraph所需的所有文件资源并使用BlobClient上传
 			ClientUtils.extractAndUploadJobGraphFiles(jobGraph, () -> new BlobClient(blobServerAddress, config));
 		} catch (FlinkException e) {
 			throw new JobSubmissionException(jobGraph.getJobID(),
 					"Could not upload job files.", e);
 		}
-
+		// 提交jobGraph到JobManager
 		CompletableFuture<Acknowledge> submissionFuture = jobManagerGateway.submitJob(jobGraph, ListeningBehaviour.DETACHED, timeout);
 
 		try {

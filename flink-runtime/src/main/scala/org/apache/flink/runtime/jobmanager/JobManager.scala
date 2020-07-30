@@ -124,7 +124,13 @@ class JobManager(
     protected val flinkConfiguration: Configuration,
     protected val futureExecutor: ScheduledExecutorService,
     protected val ioExecutor: Executor,
-    protected val instanceManager: InstanceManager,
+    protected val instanceManager: InstanceManager, // 跟踪哪些TaskManager可用,哪些是存活的
+    /**
+     *  负责在TaskManager实例和slot上分配准备运行的tasks,
+     *  调度方式:
+     *    即时调度:当有slot可用时,对slot的请求立即返回可用的slot,否则抛出没有资源可用的异常
+     *    排队调度:对slot的请求将被排队并返回一个Future,并在slot可用时立即完成
+     */
     protected val scheduler: FlinkScheduler,
     protected val blobServer: BlobServer,
     protected val libraryCacheManager: BlobLibraryCacheManager,
@@ -439,10 +445,10 @@ class JobManager(
 
     case RequestTotalNumberOfSlots =>
       sender ! decorateMessage(instanceManager.getTotalNumberOfSlots)
-
+    // 接收到提交Job的消息
     case SubmitJob(jobGraph, listeningBehaviour) =>
-      val client = sender()
-
+      val client = sender() // 获取消息发送方
+      // 存储Job相关信息
       val jobInfo = new JobInfo(client, listeningBehaviour, System.currentTimeMillis(),
         jobGraph.getSessionTimeout)
 
@@ -1232,7 +1238,7 @@ class JobManager(
         // because this makes sure that the uploaded jar files are removed in case of
         // unsuccessful
         try {
-          // library registration
+          // library registration 用所需的jar文件和类路径在LibraryCacheManager中注册job
           libraryCacheManager.registerJob(
             jobGraph.getJobID, jobGraph.getUserJarBlobKeys, jobGraph.getClasspaths)
         }
@@ -1263,7 +1269,7 @@ class JobManager(
             jobGraph.isCheckpointingEnabled)
 
         log.info(s"Using restart strategy $restartStrategy for $jobId.")
-
+        // 在指标系统中添加该Job
         val jobMetrics = jobManagerMetricGroup.addJob(jobGraph)
         // 获取总的slot数量
         val numSlots = scheduler.getTotalNumberOfSlots()
@@ -1275,12 +1281,13 @@ class JobManager(
             currentJobInfo.setLastActive()
             false
           case None =>
-            true
+            true // 是否注册一个新的ExecutionGraph
         }
-
+        // 请求slot超时时长
         val allocationTimeout: Long = flinkConfiguration.getLong(
           JobManagerOptions.SLOT_REQUEST_TIMEOUT)
-
+        // 构建ExecutionGraph
+        // JobGraph---->ExecutionGraph
         executionGraph = ExecutionGraphBuilder.buildGraph(
           executionGraph,
           jobGraph,
@@ -1354,7 +1361,7 @@ class JobManager(
               try {
                 val savepointPath = savepointSettings.getRestorePath()
                 val allowNonRestored = savepointSettings.allowNonRestoredState()
-
+                // 使用给定的savepoinnt还原state
                 executionGraph.getCheckpointCoordinator.restoreSavepoint(
                   savepointPath, 
                   allowNonRestored,

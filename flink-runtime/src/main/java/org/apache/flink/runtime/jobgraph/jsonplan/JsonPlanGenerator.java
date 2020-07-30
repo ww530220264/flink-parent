@@ -80,7 +80,7 @@ public class JsonPlanGenerator {
 				gen.writeStringField("operator", operator);
 				gen.writeStringField("operator_strategy", operatorDescr);
 				gen.writeStringField("description", description);
-				
+				// 不是输入顶点
 				if (!vertex.isInputVertex()) {
 					// write the input edge properties
 					gen.writeArrayFieldStart("inputs");

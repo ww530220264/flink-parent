@@ -95,6 +95,7 @@ public class AkkaJobManagerGateway implements JobManagerGateway {
 	public CompletableFuture<Acknowledge> submitJob(JobGraph jobGraph, ListeningBehaviour listeningBehaviour, Time timeout) {
 		return FutureUtils
 			.toJava(
+				// 给JobManager发送SubmitJob消息
 				jobManagerGateway.ask(
 					new JobManagerMessages.SubmitJob(
 						jobGraph,

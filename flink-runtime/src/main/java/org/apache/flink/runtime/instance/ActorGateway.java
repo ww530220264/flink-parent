@@ -29,7 +29,7 @@ import java.util.UUID;
 /**
  * Interface to abstract the communication with an actor.
  *
- * It allows to avoid direct interaction with an ActorRef.
+ * It allows to avoid direct interaction with an ActorRef. 避免直接与ActorRef交互
  */
 public interface ActorGateway extends Serializable {
 

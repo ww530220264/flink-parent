@@ -484,6 +484,7 @@ public abstract class ClusterClient<T> {
 	public JobSubmissionResult run(FlinkPlan compiledPlan,
 			List<URL> libraries, List<URL> classpaths, ClassLoader classLoader, SavepointRestoreSettings savepointSettings)
 			throws ProgramInvocationException {
+		// 获取JobGraph之后提交JobGraph
 		JobGraph job = getJobGraph(flinkConfig, compiledPlan, libraries, classpaths, savepointSettings);
 		return submitJob(job, classLoader);
 	}
@@ -536,9 +537,9 @@ public abstract class ClusterClient<T> {
 
 		waitForClusterToBeReady();
 
-		final ActorGateway jobManagerGateway;
+		final ActorGateway jobManagerGateway; // JobManagerGateway
 		try {
-			jobManagerGateway = getJobManagerGateway();
+			jobManagerGateway = getJobManagerGateway(); // 获取JobManager通信地址引用
 		} catch (Exception e) {
 			throw new ProgramInvocationException("Failed to retrieve the JobManager gateway.",
 				jobGraph.getJobID(), e);
@@ -546,6 +547,7 @@ public abstract class ClusterClient<T> {
 
 		try {
 			logAndSysout("Submitting Job with JobID: " + jobGraph.getJobID() + ". Returning after job submission.");
+			// 将JobGraph发送到JobManager,并等待该Job是否能启动的响应
 			JobClient.submitJobDetached(
 				new AkkaJobManagerGateway(jobManagerGateway),
 				flinkConfig,
@@ -914,9 +916,9 @@ public abstract class ClusterClient<T> {
 
 	public static JobGraph getJobGraph(Configuration flinkConfig, FlinkPlan optPlan, List<URL> jarFiles, List<URL> classpaths, SavepointRestoreSettings savepointSettings) {
 		JobGraph job;
-		if (optPlan instanceof StreamingPlan) {
-			job = ((StreamingPlan) optPlan).getJobGraph();
-			job.setSavepointRestoreSettings(savepointSettings);
+		if (optPlan instanceof StreamingPlan) { // Streaming Plan
+			job = ((StreamingPlan) optPlan).getJobGraph(); // 获取JobGraph
+			job.setSavepointRestoreSettings(savepointSettings); // 保存点设置
 		} else {
 			JobGraphGenerator gen = new JobGraphGenerator(flinkConfig);
 			job = gen.compileJobGraph((OptimizedPlan) optPlan);
@@ -924,13 +926,13 @@ public abstract class ClusterClient<T> {
 
 		for (URL jar : jarFiles) {
 			try {
-				job.addJar(new Path(jar.toURI()));
+				job.addJar(new Path(jar.toURI())); // 添加相应jar包路径
 			} catch (URISyntaxException e) {
 				throw new RuntimeException("URL is invalid. This should not happen.", e);
 			}
 		}
 
-		job.setClasspaths(classpaths);
+		job.setClasspaths(classpaths); // 类路径
 
 		return job;
 	}
@@ -975,7 +977,7 @@ public abstract class ClusterClient<T> {
 	//  Abstract methods to be implemented by the cluster specific Client
 	// ------------------------------------------------------------------------
 
-	/**
+	/**阻塞直到client任务集群为Job提交准备好了
 	 * Blocks until the client has determined that the cluster is ready for Job submission.
 	 *
 	 * <p>This is delayed until right before job submission to report any other errors first
