@@ -125,7 +125,7 @@ public final class TaskDeploymentDescriptor implements Serializable {
 	private final ExecutionAttemptID executionId;
 
 	/** The allocation ID of the slot in which the task shall be run. */
-	private final AllocationID allocationId;
+	private final AllocationID allocationId; // 将运行task的slot的分配的ID
 
 	/** The task's index in the subtask group. */
 	private final int subtaskIndex;

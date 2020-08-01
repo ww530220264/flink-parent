@@ -25,7 +25,7 @@ import java.net.URI;
 
 import static org.apache.flink.util.Preconditions.checkState;
 
-/**
+/**用来防止
  * The FileSystemSafetyNet can be used to guard a thread against {@link FileSystem} stream resource leaks.
  * When activated for a thread, it tracks all streams that are opened by FileSystems that the thread
  * obtains. The safety net has a global cleanup hook that will close all streams that were

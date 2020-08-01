@@ -1140,7 +1140,7 @@ class TaskManager(
         case None => throw new IllegalStateException("There is no valid file cache.")
       }
 
-      val slot = tdd.getTargetSlotNumber
+      val slot = tdd.getTargetSlotNumber // slot编号
       if (slot < 0 || slot >= numberOfSlots) {
         throw new IllegalArgumentException(s"Target slot $slot does not exist on TaskManager.")
       }
@@ -1161,12 +1161,12 @@ class TaskManager(
       val jobManagerGateway = new AkkaActorGateway(jobManagerActor, leaderSessionID.orNull)
 
       try {
-        tdd.loadBigData(blobCache.getPermanentBlobService);
+        tdd.loadBigData(blobCache.getPermanentBlobService); // 从Blob Store下载数据到tdd对象中
       } catch {
         case e @ (_: IOException | _: ClassNotFoundException) =>
           throw new IOException("Could not deserialize the job information.", e)
       }
-
+      // 从blob store获取的jobInformation
       val jobInformation = try {
         tdd.getSerializedJobInformation.deserializeValue(getClass.getClassLoader)
       } catch {
@@ -1178,7 +1178,7 @@ class TaskManager(
           "Inconsistent job ID information inside TaskDeploymentDescriptor (" +
           tdd.getJobId + " vs. " + jobInformation.getJobId + ")")
       }
-
+      // 从blob store获取的taskInformation
       val taskInformation = try {
         tdd.getSerializedTaskInformation.deserializeValue(getClass.getClassLoader)
       } catch {
@@ -1214,14 +1214,14 @@ class TaskManager(
         fakeAllocationID,
         taskInformation.getJobVertexId,
         tdd.getSubtaskIndex)
-
+      // task状态管理器,可以给JobManager汇报checkpoint情况
       val taskStateManager = new TaskStateManagerImpl(
         jobID,
         tdd.getExecutionAttemptId,
         taskLocalStateStore,
         tdd.getTaskRestore,
         checkpointResponder)
-
+      // 创建task对象--Runnable
       val task = new Task(
         jobInformation,
         taskInformation,

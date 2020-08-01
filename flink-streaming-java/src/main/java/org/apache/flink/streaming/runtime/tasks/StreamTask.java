@@ -246,14 +246,15 @@ public abstract class StreamTask<OUT, OP extends StreamOperator<OUT>>
 			asyncOperationsThreadPool = Executors.newCachedThreadPool();
 
 			CheckpointExceptionHandlerFactory cpExceptionHandlerFactory = createCheckpointExceptionHandlerFactory();
-
+			// 创建同步checkpoint异常处理器
 			synchronousCheckpointExceptionHandler = cpExceptionHandlerFactory.createCheckpointExceptionHandler(
 				getExecutionConfig().isFailTaskOnCheckpointError(),
 				getEnvironment());
-
+			// 创建异步checkpoint异常处理器
 			asynchronousCheckpointExceptionHandler = new AsyncCheckpointExceptionHandler(this);
-
+			// 创建状态后端
 			stateBackend = createStateBackend();
+			// 创建checkpoint存储
 			checkpointStorage = stateBackend.createCheckpointStorage(getEnvironment().getJobID());
 
 			// if the clock is not already set, then assign a default TimeServiceProvider
@@ -263,7 +264,7 @@ public abstract class StreamTask<OUT, OP extends StreamOperator<OUT>>
 
 				timerService = new SystemProcessingTimeService(this, getCheckpointLock(), timerThreadFactory);
 			}
-
+			// 创建Operator chain
 			operatorChain = new OperatorChain<>(this, streamRecordWriters);
 			headOperator = operatorChain.getHeadOperator();
 

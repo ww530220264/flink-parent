@@ -667,12 +667,12 @@ public class SingleInputGate implements InputGate {
 		TaskActions taskActions,
 		TaskIOMetricGroup metrics) {
 
-		final IntermediateDataSetID consumedResultId = checkNotNull(igdd.getConsumedResultId());
-		final ResultPartitionType consumedPartitionType = checkNotNull(igdd.getConsumedPartitionType());
+		final IntermediateDataSetID consumedResultId = checkNotNull(igdd.getConsumedResultId()); // 消费的中间结果集的ID
+		final ResultPartitionType consumedPartitionType = checkNotNull(igdd.getConsumedPartitionType()); // PartitionType
 
-		final int consumedSubpartitionIndex = igdd.getConsumedSubpartitionIndex();
+		final int consumedSubpartitionIndex = igdd.getConsumedSubpartitionIndex(); // 每个被消费的分区的子分区的被消费索引
 		checkArgument(consumedSubpartitionIndex >= 0);
-
+		// 每个InputChannelDeploymentDescriptor代表从一个子分区消费
 		final InputChannelDeploymentDescriptor[] icdd = checkNotNull(igdd.getInputChannelDeploymentDescriptors());
 
 		final SingleInputGate inputGate = new SingleInputGate(
@@ -682,9 +682,9 @@ public class SingleInputGate implements InputGate {
 		// Create the input channels. There is one input channel for each consumed partition.
 		final InputChannel[] inputChannels = new InputChannel[icdd.length];
 
-		int numLocalChannels = 0;
-		int numRemoteChannels = 0;
-		int numUnknownChannels = 0;
+		int numLocalChannels = 0; // 本地channel个数
+		int numRemoteChannels = 0;	// 远程channel个数
+		int numUnknownChannels = 0;	// unknown channel个数
 
 		for (int i = 0; i < inputChannels.length; i++) {
 			final ResultPartitionID partitionId = icdd[i].getConsumedPartitionId();
@@ -704,7 +704,7 @@ public class SingleInputGate implements InputGate {
 			else if (partitionLocation.isRemote()) {
 				inputChannels[i] = new RemoteInputChannel(inputGate, i, partitionId,
 					partitionLocation.getConnectionId(),
-					networkEnvironment.getConnectionManager(),
+					networkEnvironment.getConnectionManager(), // 在运行时管理远程输入通道的物理连接的连接管理器
 					networkEnvironment.getPartitionRequestInitialBackoff(),
 					networkEnvironment.getPartitionRequestMaxBackoff(),
 					metrics

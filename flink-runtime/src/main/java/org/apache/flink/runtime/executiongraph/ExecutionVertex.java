@@ -140,9 +140,9 @@ public class ExecutionVertex implements AccessExecutionVertex, Archiveable<Archi
 	 *            The number of prior Executions (= execution attempts) to keep.
 	 */
 	public ExecutionVertex(
-			ExecutionJobVertex jobVertex,
-			int subTaskIndex,
-			IntermediateResult[] producedDataSets,
+			ExecutionJobVertex jobVertex, // ExecutionJobVertex
+			int subTaskIndex, // 子任务index
+			IntermediateResult[] producedDataSets, // ExecutionJobVertex产生的中间结果数据集
 			Time timeout,
 			long initialGlobalModVersion,
 			long createTimestamp,
@@ -154,7 +154,7 @@ public class ExecutionVertex implements AccessExecutionVertex, Archiveable<Archi
 				jobVertex.getJobVertex().getName(), subTaskIndex + 1, jobVertex.getParallelism());
 
 		this.resultPartitions = new LinkedHashMap<>(producedDataSets.length, 1);
-
+		// 为每个中间结果集创建一个该子任务对应的分区
 		for (IntermediateResult result : producedDataSets) {
 			IntermediateResultPartition irp = new IntermediateResultPartition(result, this, subTaskIndex);
 			result.setPartition(subTaskIndex, irp);
@@ -343,9 +343,9 @@ public class ExecutionVertex implements AccessExecutionVertex, Archiveable<Archi
 	// --------------------------------------------------------------------------------------------
 	//  Graph building
 	// --------------------------------------------------------------------------------------------
-
+	//
 	public void connectSource(int inputNumber, IntermediateResult source, JobEdge edge, int consumerNumber) {
-
+		// inputNumber代表所在ExecutionJobVertex对应的JobVertex的inputs,也就是JobEdge的序号
 		final DistributionPattern pattern = edge.getDistributionPattern();
 		final IntermediateResultPartition[] sourcePartitions = source.getPartitions();
 
@@ -767,16 +767,17 @@ public class ExecutionVertex implements AccessExecutionVertex, Archiveable<Archi
 			@Nullable JobManagerTaskRestore taskRestore,
 			int attemptNumber) throws ExecutionGraphException {
 
-		// Produced intermediate results
+		// Produced intermediate results,如果该任务有2个中间结果集,那么每个结果集中都有对应该task的一个分区
 		List<ResultPartitionDeploymentDescriptor> producedPartitions = new ArrayList<>(resultPartitions.size());
 
 		// Consumed intermediate results
+		// input ExecutionEdge
 		List<InputGateDeploymentDescriptor> consumedPartitions = new ArrayList<>(inputEdges.length);
-
+		// 是否是懒调度
 		boolean lazyScheduling = getExecutionGraph().getScheduleMode().allowLazyDeployment();
-
+		// resultPartitions.values--该子任务对应的所有分区
 		for (IntermediateResultPartition partition : resultPartitions.values()) {
-
+			// 获取分区对应的消费者
 			List<List<ExecutionEdge>> consumers = partition.getConsumers();
 
 			if (consumers.isEmpty()) {
@@ -790,8 +791,8 @@ public class ExecutionVertex implements AccessExecutionVertex, Archiveable<Archi
 						"Only one consumer supported in the current implementation! Found: " + consumers.size());
 
 				List<ExecutionEdge> consumer = consumers.get(0);
-				ExecutionJobVertex vertex = consumer.get(0).getTarget().getJobVertex();
-				int maxParallelism = vertex.getMaxParallelism();
+				ExecutionJobVertex vertex = consumer.get(0).getTarget().getJobVertex(); // 下游ExecutionJobVertex
+				int maxParallelism = vertex.getMaxParallelism(); // 下游最大并行度
 				producedPartitions.add(ResultPartitionDeploymentDescriptor.from(partition, maxParallelism, lazyScheduling));
 			}
 		}
@@ -805,14 +806,14 @@ public class ExecutionVertex implements AccessExecutionVertex, Archiveable<Archi
 			// If the produced partition has multiple consumers registered, we
 			// need to request the one matching our sub task index.
 			// TODO Refactor after removing the consumers from the intermediate result partitions
-			int numConsumerEdges = edges[0].getSource().getConsumers().get(0).size();
+			int numConsumerEdges = edges[0].getSource().getConsumers().get(0).size(); // 当前消费分区的消费者数量
 
 			int queueToRequest = subTaskIndex % numConsumerEdges;
 
 			IntermediateResult consumedIntermediateResult = edges[0].getSource().getIntermediateResult();
 			final IntermediateDataSetID resultId = consumedIntermediateResult.getId();
 			final ResultPartitionType partitionType = consumedIntermediateResult.getResultType();
-
+			// 一个InputGateDeploymentDescriptor代表消费一个IntermediateDataSet所有的分区
 			consumedPartitions.add(new InputGateDeploymentDescriptor(resultId, partitionType, queueToRequest, partitions));
 		}
 

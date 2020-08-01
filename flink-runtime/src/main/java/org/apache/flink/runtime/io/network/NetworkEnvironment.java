@@ -207,18 +207,19 @@ public class NetworkEnvironment {
 	// --------------------------------------------------------------------------------------------
 
 	public void registerTask(Task task) throws IOException {
-		final ResultPartition[] producedPartitions = task.getProducedPartitions();
+		final ResultPartition[] producedPartitions = task.getProducedPartitions(); // 该任务对应产生的分区
 
 		synchronized (lock) {
 			if (isShutdown) {
 				throw new IllegalStateException("NetworkEnvironment is shut down");
 			}
-
+			// 给partition分配BufferPool并在结果分区管理器中注册该ResultPartition
 			for (final ResultPartition partition : producedPartitions) {
 				setupPartition(partition);
 			}
 
 			// Setup the buffer pool for each buffer reader
+			// 为每个Gate设置BufferPool
 			final SingleInputGate[] inputGates = task.getAllInputGates();
 			for (SingleInputGate gate : inputGates) {
 				setupInputGate(gate);
@@ -231,6 +232,7 @@ public class NetworkEnvironment {
 		BufferPool bufferPool = null;
 
 		try {
+			// 分区的子分区个数 * 每个channel的网络缓冲大小 taskmanager.network.memory.buffers-per-channel + taskmanager.network.memory.floating-buffers-per-gate
 			int maxNumberOfMemorySegments = partition.getPartitionType().isBounded() ?
 				partition.getNumberOfSubpartitions() * networkBuffersPerChannel +
 					extraNetworkBuffersPerGate : Integer.MAX_VALUE;
@@ -241,7 +243,7 @@ public class NetworkEnvironment {
 				partition.getPartitionType().hasBackPressure() ? Optional.empty() : Optional.of(partition));
 
 			partition.registerBufferPool(bufferPool);
-
+			// 在ResultPartitionManager中注册该ResultPartition
 			resultPartitionManager.registerResultPartition(partition);
 		} catch (Throwable t) {
 			if (bufferPool != null) {

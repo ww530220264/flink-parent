@@ -92,27 +92,29 @@ public class InputChannelDeploymentDescriptor implements Serializable {
 
 		// Each edge is connected to a different result partition
 		for (int i = 0; i < edges.length; i++) {
-			final IntermediateResultPartition consumedPartition = edges[i].getSource();
-			final Execution producer = consumedPartition.getProducer().getCurrentExecutionAttempt();
+			final IntermediateResultPartition consumedPartition = edges[i].getSource(); // edge对应输入分区
+			final Execution producer = consumedPartition.getProducer().getCurrentExecutionAttempt(); // 上游产生该分区的ExecutionVertex当前Execution
 
-			final ExecutionState producerState = producer.getState();
-			final LogicalSlot producerSlot = producer.getAssignedResource();
+			final ExecutionState producerState = producer.getState(); // producer[Execution]当前状态
+			final LogicalSlot producerSlot = producer.getAssignedResource(); // 获取producer的分配的逻辑slot
 
 			final ResultPartitionLocation partitionLocation;
-
+			// producer的状态需为RUNNING或FINISHED
 			// The producing task needs to be RUNNING or already FINISHED
+			// consumedPartition.isConsumable()--该partition是否可以在生产的时候被消费[resultType.isPipelined() || numberOfRunningProducers.get() == 0]
 			if (consumedPartition.isConsumable() && producerSlot != null &&
 					(producerState == ExecutionState.RUNNING ||
 						producerState == ExecutionState.FINISHED ||
 						producerState == ExecutionState.SCHEDULED ||
 						producerState == ExecutionState.DEPLOYING)) {
-
+				// 获取TaskManager location
 				final TaskManagerLocation partitionTaskManagerLocation = producerSlot.getTaskManagerLocation();
+				// 获取启动TaskManager的资源ID
 				final ResourceID partitionTaskManager = partitionTaskManagerLocation.getResourceID();
-
-				if (partitionTaskManager.equals(consumerResourceId)) {
+				// 消费分区所在的TaskManager的资源ID == 当前Task分配的资源ID
+				if (partitionTaskManager.equals(consumerResourceId)) { // 本地性发生
 					// Consuming task is deployed to the same TaskManager as the partition => local
-					partitionLocation = ResultPartitionLocation.createLocal();
+					partitionLocation = ResultPartitionLocation.createLocal(); // 从消费任务的角度看结果分区的位置是在本地
 				}
 				else {
 					// Different instances => remote

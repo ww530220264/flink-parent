@@ -601,16 +601,16 @@ public class Execution implements AccessExecution, Archiveable<ArchivedExecution
 				LOG.info(String.format("Deploying %s (attempt #%d) to %s", vertex.getTaskNameWithSubtaskIndex(),
 						attemptNumber, getAssignedResourceLocation().getHostname()));
 			}
-
+			// 创建子任务subtask部署描述信息
 			final TaskDeploymentDescriptor deployment = vertex.createDeploymentDescriptor(
-				attemptId,
-				slot,
+				attemptId, // task唯一标识符
+				slot, // 分配的逻辑slot
 				taskRestore,
 				attemptNumber);
 
 			// null taskRestore to let it be GC'ed
 			taskRestore = null;
-
+			// 根据分配的逻辑slot获取对应的TaskManagerGateway
 			final TaskManagerGateway taskManagerGateway = slot.getTaskManagerGateway();
 
 			final CompletableFuture<Acknowledge> submitResultFuture = taskManagerGateway.submitTask(deployment, rpcTimeout);

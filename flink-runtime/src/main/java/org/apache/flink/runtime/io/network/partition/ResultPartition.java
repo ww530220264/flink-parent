@@ -106,7 +106,7 @@ public class ResultPartition implements ResultPartitionWriter, BufferPoolOwner {
 
 	private final AtomicBoolean isReleased = new AtomicBoolean();
 
-	/**
+	/**引用这个分区的子分区的总数,当为0的时候,结果分区可以被安全的释放,如果为-1则说明结果分区已经被释放
 	 * The total number of references to subpartitions of this result. The result partition can be
 	 * safely released, iff the reference count is zero. A reference count of -1 denotes that the
 	 * result partition has been released.
@@ -146,6 +146,7 @@ public class ResultPartition implements ResultPartitionWriter, BufferPoolOwner {
 		this.sendScheduleOrUpdateConsumersMessage = sendScheduleOrUpdateConsumersMessage;
 
 		// Create the subpartitions.
+		// 创建子分区
 		switch (partitionType) {
 			case BLOCKING:
 				for (int i = 0; i < subpartitions.length; i++) {
@@ -289,7 +290,7 @@ public class ResultPartition implements ResultPartitionWriter, BufferPoolOwner {
 		finally {
 			if (success) {
 				isFinished = true;
-
+				// 通知PipelineConsumers
 				notifyPipelinedConsumers();
 			}
 		}
@@ -387,10 +388,10 @@ public class ResultPartition implements ResultPartitionWriter, BufferPoolOwner {
 	// ------------------------------------------------------------------------
 
 	/**
-	 * Pins the result partition.
+	 * Pins the result partition. // 固定结果分区
 	 *
 	 * <p>The partition can only be released after each subpartition has been consumed once per pin
-	 * operation.
+	 * operation.分区在每个子分区被每次Pin操作消费一次之后才能释放
 	 */
 	void pin() {
 		while (true) {

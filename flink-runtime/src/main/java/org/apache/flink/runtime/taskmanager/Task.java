@@ -358,18 +358,19 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 		int counter = 0;
 
 		for (ResultPartitionDeploymentDescriptor desc: resultPartitionDeploymentDescriptors) {
+			// desc.getPartitionId()--分区ID executionId--producer ID 也就是当前任务的ExecutionAttemptID
 			ResultPartitionID partitionId = new ResultPartitionID(desc.getPartitionId(), executionId);
-
+			// 创建结果分区及对应的子分区
 			this.producedPartitions[counter] = new ResultPartition(
-				taskNameWithSubtaskAndId,
-				this,
+				taskNameWithSubtaskAndId, // taskName
+				this, // Task
 				jobId,
-				partitionId,
-				desc.getPartitionType(),
-				desc.getNumberOfSubpartitions(),
-				desc.getMaxParallelism(),
-				networkEnvironment.getResultPartitionManager(),
-				resultPartitionConsumableNotifier,
+				partitionId, // ResultPartitionID
+				desc.getPartitionType(), // PartitionType--分区类型
+				desc.getNumberOfSubpartitions(), // 子分区个数--也就是当前分区的消费者个数
+				desc.getMaxParallelism(), // 下游最大并行数
+				networkEnvironment.getResultPartitionManager(), // ResultPartitionManager--跟踪当前TaskManager上的所有产生/消费的分区
+				resultPartitionConsumableNotifier, // 用于通知可用分区
 				ioManager,
 				desc.sendScheduleOrUpdateConsumersMessage());
 
@@ -384,7 +385,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 
 		for (InputGateDeploymentDescriptor inputGateDeploymentDescriptor: inputGateDeploymentDescriptors) {
 			SingleInputGate gate = SingleInputGate.create(
-				taskNameWithSubtaskAndId,
+				taskNameWithSubtaskAndId, // taskName
 				jobId,
 				executionId,
 				inputGateDeploymentDescriptor,
@@ -522,7 +523,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 	public void run() {
 
 		// ----------------------------
-		//  Initial State transition
+		//  Initial State transition 初始状态转变
 		// ----------------------------
 		while (true) {
 			ExecutionState current = this.executionState;
@@ -557,7 +558,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 				throw new IllegalStateException("Invalid state for beginning of operation of task " + this + '.');
 			}
 		}
-
+		// 现在的资源获取和注册在结束时都需要释放
 		// all resource acquisitions and registrations from here on
 		// need to be undone in the end
 		Map<String, Future<Path>> distributedCacheEntries = new HashMap<>();
@@ -604,7 +605,8 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 			// ----------------------------------------------------------------
 
 			LOG.info("Registering task at network: {}.", this);
-
+			// 给ResultPartition分配BufferPool并注册到ResultPartitionManager
+			// 给InputGate分配BufferPoop
 			network.registerTask(this);
 
 			// add metrics for buffers
@@ -630,6 +632,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 			}
 
 			// next, kick off the background copying of files for the distributed cache
+			// 启动分布式缓存文件的后台复制
 			try {
 				for (Map.Entry<String, DistributedCache.DistributedCacheEntry> entry :
 						DistributedCache.readFileInfoFromConfig(jobConfiguration)) {
@@ -650,7 +653,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 			// ----------------------------------------------------------------
 			//  call the user code initialization methods
 			// ----------------------------------------------------------------
-
+			// 创建task的kvState注册中心
 			TaskKvStateRegistry kvStateRegistry = network.createKvStateTaskRegistry(jobId, getJobVertexId());
 
 			Environment env = new RuntimeEnvironment(
@@ -678,7 +681,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 				metrics,
 				this);
 
-			// now load and instantiate the task's invokable code
+			// now load and instantiate the task's invokable code 加载并实例化task的可调用代码
 			invokable = loadAndInstantiateInvokable(userCodeClassLoader, nameOfInvokableClass, env);
 
 			// ----------------------------------------------------------------
@@ -694,7 +697,7 @@ public class Task implements Runnable, TaskActions, CheckpointListener {
 				throw new CancelTaskException();
 			}
 
-			// notify everyone that we switched to running
+			// notify everyone that we switched to running // 通知
 			taskManagerActions.updateTaskExecutionState(new TaskExecutionState(jobId, executionId, ExecutionState.RUNNING));
 
 			// make sure the user code classloader is accessible thread-locally

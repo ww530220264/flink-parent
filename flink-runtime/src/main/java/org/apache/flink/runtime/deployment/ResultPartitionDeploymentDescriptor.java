@@ -117,7 +117,7 @@ public class ResultPartitionDeploymentDescriptor implements Serializable {
 		final ResultPartitionType partitionType = partition.getIntermediateResult().getResultType();
 
 		// The produced data is partitioned among a number of subpartitions.
-		//
+		// 生成的数据被划分在多个子分区中,如果没有找到consumer,默认下游分区个数为1
 		// If no consumers are known at this point, we use a single subpartition, otherwise we have
 		// one for each consuming sub task.
 		int numberOfSubpartitions = 1;
@@ -127,7 +127,7 @@ public class ResultPartitionDeploymentDescriptor implements Serializable {
 			if (partition.getConsumers().size() > 1) {
 				throw new IllegalStateException("Currently, only a single consumer group per partition is supported.");
 			}
-
+			// 下游子分区个数为当前分区的消费者的个数
 			numberOfSubpartitions = partition.getConsumers().get(0).size();
 		}
 
