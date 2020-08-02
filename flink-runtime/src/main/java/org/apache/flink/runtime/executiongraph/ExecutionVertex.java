@@ -388,25 +388,28 @@ public class ExecutionVertex implements AccessExecutionVertex, Archiveable<Archi
 
 	private ExecutionEdge[] connectPointwise(IntermediateResultPartition[] sourcePartitions, int inputNumber) {
 		final int numSources = sourcePartitions.length;
-		final int parallelism = getTotalNumberOfParallelSubtasks();
+		final int parallelism = getTotalNumberOfParallelSubtasks(); // 当前所在JobVertex的并行度
 
 		// simple case same number of sources as targets
-		if (numSources == parallelism) {
+		if (numSources == parallelism) { // 判断中间结果的分区数量[也就是上游JobVertex的并行度]是否等于当前JobVertex的并行度
+			// 一个ExecutionVertex对应当前中间结果集的对应序号的这个分区
 			return new ExecutionEdge[] { new ExecutionEdge(sourcePartitions[subTaskIndex], this, inputNumber) };
 		}
-		else if (numSources < parallelism) {
+		else if (numSources < parallelism) { // 中间结果分区的数量 < 当前JobVertex的并行度
 
 			int sourcePartition;
 
 			// check if the pattern is regular or irregular
 			// we use int arithmetics for regular, and floating point with rounding for irregular
-			if (parallelism % numSources == 0) {
+			if (parallelism % numSources == 0) { // 当前并行度是上游并行度的倍数
 				// same number of targets per source
+				// 均匀划分,每个sourcePartition对应相同数量的EexcutionEdge
 				int factor = parallelism / numSources;
 				sourcePartition = subTaskIndex / factor;
 			}
 			else {
 				// different number of targets per source
+				// 不均匀划分,每个sourcePartition对应数量不相同的EexcutionEdge
 				float factor = ((float) parallelism) / numSources;
 				sourcePartition = (int) (subTaskIndex / factor);
 			}
@@ -414,11 +417,11 @@ public class ExecutionVertex implements AccessExecutionVertex, Archiveable<Archi
 			return new ExecutionEdge[] { new ExecutionEdge(sourcePartitions[sourcePartition], this, inputNumber) };
 		}
 		else {
-			if (numSources % parallelism == 0) {
+			if (numSources % parallelism == 0) { // 上游并行度是当前并行度的倍数
 				// same number of targets per source
 				int factor = numSources / parallelism;
 				int startIndex = subTaskIndex * factor;
-
+				// 每factor个sourcePartition对应n个ExecutionEdge并对应当前ExecutionVertex
 				ExecutionEdge[] edges = new ExecutionEdge[factor];
 				for (int i = 0; i < factor; i++) {
 					edges[i] = new ExecutionEdge(sourcePartitions[startIndex + i], this, inputNumber);
@@ -427,7 +430,7 @@ public class ExecutionVertex implements AccessExecutionVertex, Archiveable<Archi
 			}
 			else {
 				float factor = ((float) numSources) / parallelism;
-
+				// 每个ExecutionVertex对应不相同的sourcePartition数量
 				int start = (int) (subTaskIndex * factor);
 				int end = (subTaskIndex == getTotalNumberOfParallelSubtasks() - 1) ?
 						sourcePartitions.length :

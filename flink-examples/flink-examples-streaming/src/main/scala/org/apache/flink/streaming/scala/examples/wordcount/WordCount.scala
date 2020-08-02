@@ -67,7 +67,7 @@ object WordCount {
       // get default test text data
       env.fromElements(WordCountData.WORDS: _*) // 转为参数序列
     }
-    env.setParallelism(2)
+    env.setParallelism(1)
     val counts: DataStream[(String, Int)] = text
       // split up the lines in pairs (2-tuples) containing: (word,1)
       .flatMap(_.toLowerCase.split("\\W+"))

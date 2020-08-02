@@ -413,6 +413,7 @@ public class JobGraph implements Serializable {
 
 		// start by finding the vertices with no input edges
 		// and the ones with disconnected inputs (that refer to some standalone data set)
+		// 找到那些没有input edges的JobVertexs,从这些JobVertexs开始
 		{
 			Iterator<JobVertex> iter = remaining.iterator();
 			while (iter.hasNext()) {

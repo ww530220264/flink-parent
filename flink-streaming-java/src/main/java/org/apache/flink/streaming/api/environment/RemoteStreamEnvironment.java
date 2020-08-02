@@ -174,7 +174,7 @@ public class RemoteStreamEnvironment extends StreamExecutionEnvironment {
 		StreamGraph streamGraph = getStreamGraph();
 		streamGraph.setJobName(jobName);
 		transformations.clear();
-		// 远程汇享StreamGraph
+		// 远程执行StreamGraph
 		return executeRemotely(streamGraph, jarFiles);
 	}
 

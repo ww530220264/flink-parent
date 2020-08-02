@@ -437,7 +437,7 @@ public class ExecutionJobVertex implements AccessExecutionJobVertex, Archiveable
 		}
 
 		for (int num = 0; num < inputs.size(); num++) {
-			JobEdge edge = inputs.get(num);
+			JobEdge edge = inputs.get(num); // num 第几个input
 
 			if (LOG.isDebugEnabled()) {
 				if (edge.getSource() == null) {
@@ -462,7 +462,7 @@ public class ExecutionJobVertex implements AccessExecutionJobVertex, Archiveable
 			int consumerIndex = ires.registerConsumer();
 
 			for (int i = 0; i < parallelism; i++) {
-				ExecutionVertex ev = taskVertices[i];
+				ExecutionVertex ev = taskVertices[i]; // 第i个ExecutionVertex
 				ev.connectSource(num, ires, edge, consumerIndex);
 			}
 		}
