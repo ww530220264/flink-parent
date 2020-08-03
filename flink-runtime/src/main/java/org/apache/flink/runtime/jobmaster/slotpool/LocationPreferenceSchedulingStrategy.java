@@ -106,12 +106,12 @@ public class LocationPreferenceSchedulingStrategy implements SchedulingStrategy 
 			if (additionalRequirementsFilter.test(candidate)) {
 				SlotInfo slotContext = contextExtractor.apply(candidate);
 
-				// this gets candidate is local-weigh
+				// this gets candidate is local-weigh // taskManager本地权重
 				Integer localWeigh = preferredResourceIDs.getOrDefault(slotContext.getTaskManagerLocation().getResourceID(), 0);
 
-				// this gets candidate is host-local-weigh
+				// this gets candidate is host-local-weigh // 主机本地权重
 				Integer hostLocalWeigh = preferredFQHostNames.getOrDefault(slotContext.getTaskManagerLocation().getFQDNHostname(), 0);
-
+				// localWeigh * 10 + hostLocalWeigh
 				int candidateScore = LOCALITY_EVALUATION_FUNCTION.apply(localWeigh, hostLocalWeigh);
 				if (candidateScore > bestCandidateScore) {
 					bestCandidateScore = candidateScore;

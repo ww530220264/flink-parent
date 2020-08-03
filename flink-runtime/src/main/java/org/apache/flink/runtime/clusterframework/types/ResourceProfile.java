@@ -33,7 +33,7 @@ import java.util.Objects;
 /**
  * Describe the immutable resource profile of the slot, either when requiring or offering it. The profile can be
  * checked whether it can match another profile's requirement, and furthermore we may calculate a matching
- * score to decide which profile we should choose when we have lots of candidate slots.
+ * score to decide which profile we should choose when we have lots of candidate slots. 当我们有很多的候选slot时,可以计算匹配度
  * It should be generated from {@link ResourceSpec} with the input and output memory calculated in JobMaster.
  *
  * <p>Resource Profiles have a total ordering, defined by comparing these fields in sequence:

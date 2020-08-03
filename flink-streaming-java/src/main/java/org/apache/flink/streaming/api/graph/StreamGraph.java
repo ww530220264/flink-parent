@@ -393,12 +393,12 @@ public class StreamGraph extends StreamingPlan {
 			StreamPartitioner<?> partitioner,
 			List<String> outputNames,
 			OutputTag outputTag) {
-
+		// 如果上游节点是虚拟节点
 		if (virtualSideOutputNodes.containsKey(upStreamVertexID)) {
 			int virtualId = upStreamVertexID;
-			upStreamVertexID = virtualSideOutputNodes.get(virtualId).f0;
+			upStreamVertexID = virtualSideOutputNodes.get(virtualId).f0; // 实际上游节点ID
 			if (outputTag == null) {
-				outputTag = virtualSideOutputNodes.get(virtualId).f1;
+				outputTag = virtualSideOutputNodes.get(virtualId).f1; // 虚拟节点的输出类型
 			}
 			addEdgeInternal(upStreamVertexID, downStreamVertexID, typeNumber, partitioner, null, outputTag);
 		} else if (virtualSelectNodes.containsKey(upStreamVertexID)) {

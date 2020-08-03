@@ -40,12 +40,12 @@ import org.junit.Assert._
 import org.junit.Test
 
 /**
-  * These tests verify that the api calls on [[WindowedStream]] instantiate the correct
-  * window operator.
-  *
-  * We also create a test harness and push one element into the operator to verify
-  * that we get some output.
-  */
+ * These tests verify that the api calls on [[WindowedStream]] instantiate the correct
+ * window operator.
+ *
+ * We also create a test harness and push one element into the operator to verify
+ * that we get some output.
+ */
 class WindowTranslationTest {
 
   // --------------------------------------------------------------------------
@@ -53,10 +53,11 @@ class WindowTranslationTest {
   // --------------------------------------------------------------------------
 
   /**
-    * .reduce() does not support [[RichReduceFunction]], since the reduce function is used
-    * internally in a [[org.apache.flink.api.common.state.ReducingState]].
-    */
-  @Test(expected = classOf[UnsupportedOperationException])
+   * .reduce() does not support [[RichReduceFunction]], since the reduce function is used
+   * internally in a [[org.apache.flink.api.common.state.ReducingState]].
+   */
+//  @Test(expected = classOf[UnsupportedOperationException])
+  @Test
   def testReduceWithRichReducerFails() {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     val source = env.fromElements(("hello", 1), ("hello", 2))
@@ -66,11 +67,14 @@ class WindowTranslationTest {
     source
       .keyBy(0)
       .window(SlidingEventTimeWindows.of(Time.seconds(1), Time.milliseconds(100)))
-      .reduce(new RichReduceFunction[(String, Int)] {
-        override def reduce(value1: (String, Int), value2: (String, Int)) = null
-      })
-
-    fail("exception was not thrown")
+      .reduce((t1, t2) => {
+        (t1._1, t1._2 + t2._2)
+      }).printToErr()
+    //      .reduce(new RichReduceFunction[(String, Int)] {
+    //        override def reduce(value1: (String, Int), value2: (String, Int)) = null
+    //      })
+      env.execute()
+//    fail("exception was not thrown")
   }
 
   /**
@@ -93,9 +97,9 @@ class WindowTranslationTest {
   }
 
   /**
-    * .fold() does not support [[RichFoldFunction]], since the reduce function is used internally
-    * in a [[org.apache.flink.api.common.state.FoldingState]].
-    */
+   * .fold() does not support [[RichFoldFunction]], since the reduce function is used internally
+   * in a [[org.apache.flink.api.common.state.FoldingState]].
+   */
   @Test(expected = classOf[UnsupportedOperationException])
   def testFoldWithRichFolderFails() {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
@@ -154,10 +158,10 @@ class WindowTranslationTest {
     try
       windowedStream.trigger(new Trigger[String, TimeWindow]() {
         def onElement(
-            element: String,
-            timestamp: Long,
-            window: TimeWindow,
-            ctx: Trigger.TriggerContext) = null
+                       element: String,
+                       timestamp: Long,
+                       window: TimeWindow,
+                       ctx: Trigger.TriggerContext) = null
 
         def onProcessingTime(time: Long, window: TimeWindow, ctx: Trigger.TriggerContext) = null
 
@@ -295,7 +299,7 @@ class WindowTranslationTest {
     val window1 = source
       .keyBy(_._1)
       .window(SlidingEventTimeWindows.of(Time.seconds(1), Time.milliseconds(100)))
-      .reduce( (x, _) => x )
+      .reduce((x, _) => x)
 
     val transform = window1
       .javaStream
@@ -332,11 +336,11 @@ class WindowTranslationTest {
       .reduce(
         new DummyReducer, new WindowFunction[(String, Int), (String, Int), String, TimeWindow] {
           override def apply(
-              key: String,
-              window: TimeWindow,
-              input: Iterable[(String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach ( x => out.collect(x))
-      })
+                              key: String,
+                              window: TimeWindow,
+                              input: Iterable[(String, Int)],
+                              out: Collector[(String, Int)]): Unit = input foreach (x => out.collect(x))
+        })
 
     val transform = window1
       .javaStream
@@ -373,10 +377,10 @@ class WindowTranslationTest {
       .reduce(
         new DummyReducer, new WindowFunction[(String, Int), (String, Int), String, TimeWindow] {
           override def apply(
-              key: String,
-              window: TimeWindow,
-              input: Iterable[(String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach ( x => out.collect(x))
+                              key: String,
+                              window: TimeWindow,
+                              input: Iterable[(String, Int)],
+                              out: Collector[(String, Int)]): Unit = input foreach (x => out.collect(x))
         })
 
     val transform = window1
@@ -415,10 +419,10 @@ class WindowTranslationTest {
         new DummyReducer,
         new ProcessWindowFunction[(String, Int), (String, Int), String, TimeWindow] {
           override def process(
-              key: String,
-              window: Context,
-              input: Iterable[(String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach ( x => out.collect(x))
+                                key: String,
+                                window: Context,
+                                input: Iterable[(String, Int)],
+                                out: Collector[(String, Int)]): Unit = input foreach (x => out.collect(x))
         })
 
     val transform = window1
@@ -457,10 +461,10 @@ class WindowTranslationTest {
         new DummyReducer,
         new ProcessWindowFunction[(String, Int), (String, Int), String, TimeWindow] {
           override def process(
-              key: String,
-              window: Context,
-              input: Iterable[(String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach ( x => out.collect(x))
+                                key: String,
+                                window: Context,
+                                input: Iterable[(String, Int)],
+                                out: Collector[(String, Int)]): Unit = input foreach (x => out.collect(x))
         })
 
     val transform = window1
@@ -498,10 +502,10 @@ class WindowTranslationTest {
       .apply(
         new DummyReducer, new WindowFunction[(String, Int), (String, Int), String, TimeWindow] {
           override def apply(
-              key: String,
-              window: TimeWindow,
-              input: Iterable[(String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach ( x => out.collect(x))
+                              key: String,
+                              window: TimeWindow,
+                              input: Iterable[(String, Int)],
+                              out: Collector[(String, Int)]): Unit = input foreach (x => out.collect(x))
         })
 
     val transform = window1
@@ -541,10 +545,10 @@ class WindowTranslationTest {
         new DummyReducer,
         new WindowFunction[(String, Int), (String, Int), String, TimeWindow] {
           override def apply(
-              key: String,
-              window: TimeWindow,
-              input: Iterable[(String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach ( x => out.collect(x))
+                              key: String,
+                              window: TimeWindow,
+                              input: Iterable[(String, Int)],
+                              out: Collector[(String, Int)]): Unit = input foreach (x => out.collect(x))
         })
 
     val transform = window1
@@ -584,7 +588,7 @@ class WindowTranslationTest {
         { (x, _) => x },
         {
           (_: String, _: TimeWindow, in: Iterable[(String, Int)], out: Collector[(String, Int)]) =>
-            in foreach { x => out.collect(x)}
+            in foreach { x => out.collect(x) }
         })
 
     val transform = window1
@@ -830,7 +834,7 @@ class WindowTranslationTest {
       .aggregate(
         new DummyAggregator(),
         { (_: String, _: TimeWindow, in: Iterable[(String, Int)], out: Collector[(String, Int)]) =>
-          in foreach { x => out.collect(x)}
+          in foreach { x => out.collect(x) }
         })
 
     val transform = window1
@@ -977,10 +981,10 @@ class WindowTranslationTest {
         new DummyFolder,
         new WindowFunction[(String, String, Int), (String, Int), String, TimeWindow] {
           override def apply(
-              key: String,
-              window: TimeWindow,
-              input: Iterable[(String, String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach {x => out.collect((x._1, x._3))}
+                              key: String,
+                              window: TimeWindow,
+                              input: Iterable[(String, String, Int)],
+                              out: Collector[(String, Int)]): Unit = input foreach { x => out.collect((x._1, x._3)) }
         })
 
     val transform = window1
@@ -1020,10 +1024,10 @@ class WindowTranslationTest {
         new DummyFolder,
         new WindowFunction[(String, String, Int), (String, Int), String, TimeWindow] {
           override def apply(
-              key: String,
-              window: TimeWindow,
-              input: Iterable[(String, String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach {x => out.collect((x._1, x._3))}
+                              key: String,
+                              window: TimeWindow,
+                              input: Iterable[(String, String, Int)],
+                              out: Collector[(String, Int)]): Unit = input foreach { x => out.collect((x._1, x._3)) }
         })
 
     val transform = window1
@@ -1063,10 +1067,10 @@ class WindowTranslationTest {
         new DummyFolder,
         new ProcessWindowFunction[(String, String, Int), (String, Int), String, TimeWindow] {
           override def process(
-              key: String,
-              window: Context,
-              input: Iterable[(String, String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach {x => out.collect((x._1, x._3))}
+                                key: String,
+                                window: Context,
+                                input: Iterable[(String, String, Int)],
+                                out: Collector[(String, Int)]): Unit = input foreach { x => out.collect((x._1, x._3)) }
         })
 
     val transform = window1
@@ -1106,10 +1110,10 @@ class WindowTranslationTest {
         new DummyFolder,
         new ProcessWindowFunction[(String, String, Int), (String, Int), String, TimeWindow] {
           override def process(
-              key: String,
-              window: Context,
-              input: Iterable[(String, String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach {x => out.collect((x._1, x._3))}
+                                key: String,
+                                window: Context,
+                                input: Iterable[(String, String, Int)],
+                                out: Collector[(String, Int)]): Unit = input foreach { x => out.collect((x._1, x._3)) }
         })
 
     val transform = window1
@@ -1149,11 +1153,11 @@ class WindowTranslationTest {
         new DummyFolder,
         new WindowFunction[(String, String, Int), (String, String, Int), String, TimeWindow] {
           override def apply(
-              key: String,
-              window: TimeWindow,
-              input: Iterable[(String, String, Int)],
-              out: Collector[(String, String, Int)]): Unit =
-            input foreach {x => out.collect((x._1, x._2, x._3))}
+                              key: String,
+                              window: TimeWindow,
+                              input: Iterable[(String, String, Int)],
+                              out: Collector[(String, String, Int)]): Unit =
+            input foreach { x => out.collect((x._1, x._2, x._3)) }
         })
 
     val transform = window1
@@ -1198,7 +1202,7 @@ class WindowTranslationTest {
                               window: TimeWindow,
                               input: Iterable[(String, String, Int)],
                               out: Collector[(String, String, Int)]): Unit =
-            input foreach {x => out.collect((x._1, x._2, x._3))}
+            input foreach { x => out.collect((x._1, x._2, x._3)) }
         })
 
     val transform = window1
@@ -1241,7 +1245,7 @@ class WindowTranslationTest {
             _: TimeWindow,
             in: Iterable[(String, String, Int)],
             out: Collector[(String, Int)]) =>
-              in foreach { x => out.collect((x._1, x._3)) }
+          in foreach { x => out.collect((x._1, x._3)) }
         })
 
     val transform = window1
@@ -1283,10 +1287,10 @@ class WindowTranslationTest {
       .apply(
         new WindowFunction[(String, Int), (String, Int), String, TimeWindow] {
           override def apply(
-              key: String,
-              window: TimeWindow,
-              input: Iterable[(String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach {x => out.collect((x._1, x._2))}
+                              key: String,
+                              window: TimeWindow,
+                              input: Iterable[(String, Int)],
+                              out: Collector[(String, Int)]): Unit = input foreach { x => out.collect((x._1, x._2)) }
         })
 
     val transform = window1
@@ -1324,10 +1328,10 @@ class WindowTranslationTest {
       .apply(
         new WindowFunction[(String, Int), (String, Int), String, TimeWindow] {
           override def apply(
-              key: String,
-              window: TimeWindow,
-              input: Iterable[(String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach {x => out.collect((x._1, x._2))}
+                              key: String,
+                              window: TimeWindow,
+                              input: Iterable[(String, Int)],
+                              out: Collector[(String, Int)]): Unit = input foreach { x => out.collect((x._1, x._2)) }
         })
 
     val transform = window1
@@ -1365,10 +1369,10 @@ class WindowTranslationTest {
       .process(
         new ProcessWindowFunction[(String, Int), (String, Int), String, TimeWindow] {
           override def process(
-              key: String,
-              window: Context,
-              input: Iterable[(String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach {x => out.collect((x._1, x._2))}
+                                key: String,
+                                window: Context,
+                                input: Iterable[(String, Int)],
+                                out: Collector[(String, Int)]): Unit = input foreach { x => out.collect((x._1, x._2)) }
         })
 
     val transform = window1
@@ -1406,10 +1410,10 @@ class WindowTranslationTest {
       .process(
         new ProcessWindowFunction[(String, Int), (String, Int), String, TimeWindow] {
           override def process(
-              key: String,
-              window: Context,
-              input: Iterable[(String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach {x => out.collect((x._1, x._2))}
+                                key: String,
+                                window: Context,
+                                input: Iterable[(String, Int)],
+                                out: Collector[(String, Int)]): Unit = input foreach { x => out.collect((x._1, x._2)) }
         })
 
     val transform = window1
@@ -1445,7 +1449,7 @@ class WindowTranslationTest {
       .keyBy(_._1)
       .window(TumblingEventTimeWindows.of(Time.seconds(1), Time.milliseconds(100)))
       .apply { (key, window, in, out: Collector[(String, Int)]) =>
-        in foreach { x => out.collect(x)}
+        in foreach { x => out.collect(x) }
       }
 
     val transform = window1
@@ -1555,10 +1559,10 @@ class WindowTranslationTest {
       .apply(
         new WindowFunction[(String, Int), (String, Int), String, TimeWindow] {
           override def apply(
-              key: String,
-              window: TimeWindow,
-              input: Iterable[(String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach {x => out.collect((x._1, x._2))}
+                              key: String,
+                              window: TimeWindow,
+                              input: Iterable[(String, Int)],
+                              out: Collector[(String, Int)]): Unit = input foreach { x => out.collect((x._1, x._2)) }
         })
 
     val transform = window1
@@ -1597,10 +1601,10 @@ class WindowTranslationTest {
       .process(
         new ProcessWindowFunction[(String, Int), (String, Int), String, TimeWindow] {
           override def process(
-              key: String,
-              window: Context,
-              input: Iterable[(String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach {x => out.collect((x._1, x._2))}
+                                key: String,
+                                window: Context,
+                                input: Iterable[(String, Int)],
+                                out: Collector[(String, Int)]): Unit = input foreach { x => out.collect((x._1, x._2)) }
         })
 
     val transform = window1
@@ -1867,10 +1871,10 @@ class WindowTranslationTest {
       .apply(
         new WindowFunction[(String, Int), (String, Int), String, TimeWindow] {
           override def apply(
-              key: String,
-              window: TimeWindow,
-              input: Iterable[(String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach {x => out.collect((x._1, x._2))}
+                              key: String,
+                              window: TimeWindow,
+                              input: Iterable[(String, Int)],
+                              out: Collector[(String, Int)]): Unit = input foreach { x => out.collect((x._1, x._2)) }
         })
 
     val transform = window1
@@ -1910,10 +1914,10 @@ class WindowTranslationTest {
       .process(
         new ProcessWindowFunction[(String, Int), (String, Int), String, TimeWindow] {
           override def process(
-              key: String,
-              window: Context,
-              input: Iterable[(String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach {x => out.collect((x._1, x._2))}
+                                key: String,
+                                window: Context,
+                                input: Iterable[(String, Int)],
+                                out: Collector[(String, Int)]): Unit = input foreach { x => out.collect((x._1, x._2)) }
         })
 
     val transform = window1
@@ -1940,15 +1944,15 @@ class WindowTranslationTest {
   }
 
   /**
-    * Ensure that we get some output from the given operator when pushing in an element and
-    * setting watermark and processing time to `Long.MaxValue`.
-    */
+   * Ensure that we get some output from the given operator when pushing in an element and
+   * setting watermark and processing time to `Long.MaxValue`.
+   */
   @throws[Exception]
   private def processElementAndEnsureOutput[K, IN, OUT](
-      operator: OneInputStreamOperator[IN, OUT],
-      keySelector: KeySelector[IN, K],
-      keyType: TypeInformation[K],
-      element: IN) {
+                                                         operator: OneInputStreamOperator[IN, OUT],
+                                                         keySelector: KeySelector[IN, K],
+                                                         keyType: TypeInformation[K],
+                                                         element: IN) {
     val testHarness =
       new KeyedOneInputStreamOperatorTestHarness[K, IN, OUT](operator, keySelector, keyType)
 
@@ -1999,8 +2003,7 @@ class DummyAggregator extends AggregateFunction[(String, Int), (String, Int), (S
   override def add(value: (String, Int), accumulator: (String, Int)): (String, Int) = accumulator
 }
 
-class DummyRichAggregator extends RichAggregateFunction[(String, Int), (String, Int), (String, Int)]
-{
+class DummyRichAggregator extends RichAggregateFunction[(String, Int), (String, Int), (String, Int)] {
 
   override def createAccumulator(): (String, Int) = ("", 0)
 
@@ -2015,10 +2018,10 @@ class TestWindowFunction
   extends WindowFunction[(String, Int), (String, String, Int), String, TimeWindow] {
 
   override def apply(
-      key: String,
-      window: TimeWindow,
-      input: Iterable[(String, Int)],
-      out: Collector[(String, String, Int)]): Unit = {
+                      key: String,
+                      window: TimeWindow,
+                      input: Iterable[(String, Int)],
+                      out: Collector[(String, String, Int)]): Unit = {
 
     input.foreach(e => out.collect((e._1, e._1, e._2)))
   }
@@ -2028,10 +2031,10 @@ class TestProcessWindowFunction
   extends ProcessWindowFunction[(String, Int), (String, String, Int), String, TimeWindow] {
 
   override def process(
-      key: String,
-      window: Context,
-      input: Iterable[(String, Int)],
-      out: Collector[(String, String, Int)]): Unit = {
+                        key: String,
+                        window: Context,
+                        input: Iterable[(String, Int)],
+                        out: Collector[(String, String, Int)]): Unit = {
 
     input.foreach(e => out.collect((e._1, e._1, e._2)))
   }

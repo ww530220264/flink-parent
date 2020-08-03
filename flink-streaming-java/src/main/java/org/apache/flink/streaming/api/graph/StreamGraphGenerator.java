@@ -545,7 +545,7 @@ public class StreamGraphGenerator {
 				transform.getInputType(),
 				transform.getOutputType(),
 				transform.getName());
-
+		// keySelector
 		if (transform.getStateKeySelector() != null) {
 			TypeSerializer<?> keySerializer = transform.getStateKeyType().createSerializer(env.getConfig());
 			streamGraph.setOneInputStateKey(transform.getId(), transform.getStateKeySelector(), keySerializer);

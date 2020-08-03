@@ -56,7 +56,7 @@ public class PreviousAllocationSchedulingStrategy extends LocationPreferenceSche
 			@Nonnull BiFunction<IN, Locality, OUT> resultProducer) {
 
 		Collection<AllocationID> priorAllocations = slotProfile.getPreferredAllocations();
-
+		// 如果之前分配的slots为空,则使用LocationPreferenceSchedulingStrategy策略
 		if (priorAllocations.isEmpty()) {
 			return super.findMatchWithLocality(
 				slotProfile,

@@ -29,21 +29,21 @@ public interface SlotInfo {
 	/**
 	 * Gets the id under which the slot has been allocated on the TaskManager. This id uniquely identifies the
 	 * physical slot.
-	 *
+	 * 唯一标识一个物理的slot
 	 * @return The id under which the slot has been allocated on the TaskManager
 	 */
 	AllocationID getAllocationId();
 
 	/**
 	 * Gets the location info of the TaskManager that offers this slot.
-	 *
+	 * 获取对应TaskManager的地址
 	 * @return The location info of the TaskManager that offers this slot
 	 */
 	TaskManagerLocation getTaskManagerLocation();
 
 	/**
 	 * Gets the number of the slot.
-	 *
+	 * 获取TaskManager上的slot数量
 	 * @return The number of the slot on the TaskManager.
 	 */
 	int getPhysicalSlotNumber();

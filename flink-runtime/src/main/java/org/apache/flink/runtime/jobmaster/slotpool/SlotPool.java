@@ -78,10 +78,12 @@ import java.util.stream.Stream;
 
 import static org.apache.flink.util.Preconditions.checkNotNull;
 
-/**
+/**为ExecutionGraph发起的slot请求提供服务
  * The slot pool serves slot request issued by {@link ExecutionGraph}. It will will attempt to acquire new slots
+ * 当不能提供为一个slot的请求提供服务时,它将尝试从resourceManager获取一个新的slot,如果RM不可用或被RM拒绝,或请求超时,则slot请求失败
  * from the ResourceManager when it cannot serve a slot request. If no ResourceManager is currently available,
  * or it gets a decline from the ResourceManager, or a request times out, it fails the slot request. The slot pool also
+ * 保存所有提供给它并接受的slots,因此当RM不可用时也可以提供注册的空闲的slots
  * holds all the slots that were offered to it and accepted, and can thus provides registered free slots even if the
  * ResourceManager is down. The slots will only be released when they are useless, e.g. when the job is fully running
  * but we still have some free slots.
@@ -104,19 +106,19 @@ public class SlotPool extends RpcEndpoint implements SlotPoolGateway, AllocatedS
 	private final ProviderAndOwner providerAndOwner;
 
 	/** All registered TaskManagers, slots will be accepted and used only if the resource is registered. */
-	private final HashSet<ResourceID> registeredTaskManagers;
+	private final HashSet<ResourceID> registeredTaskManagers; // 所有已注册的taskManagers
 
 	/** The book-keeping of all allocated slots. */
-	private final AllocatedSlots allocatedSlots;
+	private final AllocatedSlots allocatedSlots; // 所有已分配的slots
 
 	/** The book-keeping of all available slots. */
-	private final AvailableSlots availableSlots;
+	private final AvailableSlots availableSlots; // 所有可用的slots
 
 	/** All pending requests waiting for slots. */
-	private final DualKeyMap<SlotRequestId, AllocationID, PendingRequest> pendingRequests;
+	private final DualKeyMap<SlotRequestId, AllocationID, PendingRequest> pendingRequests; // 所有等待slot的挂起的请求
 
 	/** The requests that are waiting for the resource manager to be connected. */
-	private final HashMap<SlotRequestId, PendingRequest> waitingForResourceManager;
+	private final HashMap<SlotRequestId, PendingRequest> waitingForResourceManager; // 正在等待RM连接的请求
 
 	/** Timeout for external request calls (e.g. to the ResourceManager or the TaskExecutor). */
 	private final Time rpcTimeout;
@@ -328,7 +330,7 @@ public class SlotPool extends RpcEndpoint implements SlotPoolGateway, AllocatedS
 			Time allocationTimeout) {
 
 		log.debug("Received slot request [{}] for task: {}", slotRequestId, task.getTaskToExecute());
-
+		// 如果该task有共享slot
 		if (task.getSlotSharingGroupId() == null) {
 			return allocateSingleSlot(slotRequestId, slotProfile, allowQueuedScheduling, allocationTimeout);
 		} else {
@@ -580,7 +582,7 @@ public class SlotPool extends RpcEndpoint implements SlotPoolGateway, AllocatedS
 		if (allowQueuedScheduling) {
 			// there is no slot immediately available --> check first for uncompleted slots at the slot sharing group
 			SlotSharingManager.MultiTaskSlot multiTaskSlotFuture = slotSharingManager.getUnresolvedRootSlot(groupId);
-
+			// 从resourceManager申请一个Slot
 			if (multiTaskSlotFuture == null) {
 				// it seems as if we have to request a new slot from the resource manager, this is always the last resort!!!
 				final CompletableFuture<AllocatedSlot> futureSlot = requestNewAllocatedSlot(

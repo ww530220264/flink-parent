@@ -43,9 +43,9 @@ public class MemorySegmentSimpleTest {
 
 	public static final long RANDOM_SEED = 643196033469871L;
 
-	public static final int MANAGED_MEMORY_SIZE = 1024 * 1024 * 16;
+	public static final int MANAGED_MEMORY_SIZE = 1024 * 1024 * 16; // 16M
 
-	public static final int PAGE_SIZE = 1024 * 512;
+	public static final int PAGE_SIZE = 1024 * 512; // 512KB
 
 	private MemoryManager manager;
 
@@ -82,7 +82,7 @@ public class MemorySegmentSimpleTest {
 
 		// test exceptions
 		{
-			byte[] bytes = new byte[PAGE_SIZE / 4];
+			byte[] bytes = new byte[PAGE_SIZE / 4]; // 128
 
 			try {
 				segment.put(3 * (PAGE_SIZE / 4) + 1, bytes);
