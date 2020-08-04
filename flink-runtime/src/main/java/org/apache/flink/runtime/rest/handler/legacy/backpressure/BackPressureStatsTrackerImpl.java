@@ -48,7 +48,7 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 
 /**
  * Back pressure statistics tracker.
- *
+ * 背压是被采样运行中的人物决定的,如果一个人物因为背压而变慢,它将被卡在对LocalBufferPool的内存请求中
  * <p>Back pressure is determined by sampling running tasks. If a task is
  * slowed down by back pressure it will be stuck in memory requests to a
  * {@link org.apache.flink.runtime.io.network.buffer.LocalBufferPool}.

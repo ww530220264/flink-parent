@@ -47,6 +47,7 @@ import static org.apache.flink.util.Preconditions.checkArgument;
 import static org.apache.flink.util.Preconditions.checkNotNull;
 
 /**
+ * 触发任务的堆栈采样和收集任务堆栈信息的协调器
  * A coordinator for triggering and collecting stack traces of running tasks.
  */
 public class StackTraceSampleCoordinator {
@@ -95,7 +96,7 @@ public class StackTraceSampleCoordinator {
 
 	/**
 	 * Triggers a stack trace sample to all tasks.
-	 *
+	 * 触发所有任务的堆栈采样
 	 * @param tasksToSample       Tasks to sample.
 	 * @param numSamples          Number of stack trace samples to collect.
 	 * @param delayBetweenSamples Delay between consecutive samples.
