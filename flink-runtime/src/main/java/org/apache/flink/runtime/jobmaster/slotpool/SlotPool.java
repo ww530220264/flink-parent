@@ -531,7 +531,7 @@ public class SlotPool extends RpcEndpoint implements SlotPoolGateway, AllocatedS
 	 * @throws NoResourceAvailableException if no task slot could be allocated
 	 */
 	private SlotSharingManager.MultiTaskSlotLocality allocateMultiTaskSlot(
-			AbstractID groupId,
+			AbstractID groupId, // JobVertexID
 			SlotSharingManager slotSharingManager,
 			SlotProfile slotProfile,
 			boolean allowQueuedScheduling,

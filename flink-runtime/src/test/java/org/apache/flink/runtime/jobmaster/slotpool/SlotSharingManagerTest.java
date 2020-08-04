@@ -522,7 +522,7 @@ public class SlotSharingManagerTest extends TestLogger {
 			new SlotRequestId(),
 			groupId,
 			Locality.UNKNOWN);
-
+		// root和children的group都不包含该groupId
 		SlotSharingManager.MultiTaskSlot unresolvedRootSlot1 = slotSharingManager.getUnresolvedRootSlot(groupId);
 
 		// we should no longer have a free unresolved root slot

@@ -78,7 +78,7 @@ public class LocationPreferenceSchedulingStrategy implements SchedulingStrategy 
 		Collection<TaskManagerLocation> locationPreferences = slotProfile.getPreferredLocations();
 
 		// if we have no location preferences, we can only filter by the additional requirements.
-		if (locationPreferences.isEmpty()) {
+		if (locationPreferences.isEmpty()) { // 首选location为空
 			return candidates
 				.filter(additionalRequirementsFilter)
 				.findFirst()
@@ -105,11 +105,11 @@ public class LocationPreferenceSchedulingStrategy implements SchedulingStrategy 
 			IN candidate = iterator.next();
 			if (additionalRequirementsFilter.test(candidate)) {
 				SlotInfo slotContext = contextExtractor.apply(candidate);
-
-				// this gets candidate is local-weigh // taskManager本地权重
+				// taskManager本地权重
+				// this gets candidate is local-weigh
 				Integer localWeigh = preferredResourceIDs.getOrDefault(slotContext.getTaskManagerLocation().getResourceID(), 0);
-
-				// this gets candidate is host-local-weigh // 主机本地权重
+				// 主机本地权重
+				// this gets candidate is host-local-weigh
 				Integer hostLocalWeigh = preferredFQHostNames.getOrDefault(slotContext.getTaskManagerLocation().getFQDNHostname(), 0);
 				// localWeigh * 10 + hostLocalWeigh
 				int candidateScore = LOCALITY_EVALUATION_FUNCTION.apply(localWeigh, hostLocalWeigh);

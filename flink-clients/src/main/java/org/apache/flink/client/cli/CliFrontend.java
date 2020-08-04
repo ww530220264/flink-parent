@@ -221,6 +221,7 @@ public class CliFrontend {
 			CommandLine commandLine,
 			RunOptions runOptions,
 			PackagedProgram program) throws ProgramInvocationException, FlinkException {
+		// 启动集群的描述信息,内含yarnClient
 		final ClusterDescriptor<T> clusterDescriptor = customCommandLine.createClusterDescriptor(commandLine);
 
 		try {
@@ -230,11 +231,13 @@ public class CliFrontend {
 
 			// directly deploy the job if the cluster is started in job mode and detached
 			if (clusterId == null && runOptions.getDetachedMode()) {
+				// 并行度 p|parallelism
 				int parallelism = runOptions.getParallelism() == -1 ? defaultParallelism : runOptions.getParallelism();
-
+				// 获取JobGraph
 				final JobGraph jobGraph = PackagedProgramUtils.createJobGraph(program, configuration, parallelism);
-
+				// 获取启动集群的描述信息 TaskManager个数/JobManager内存/TaskManager内存/每个TaskManager上的slot个数
 				final ClusterSpecification clusterSpecification = customCommandLine.getClusterSpecification(commandLine);
+				// 部署JobCluster,返回部署成功的Flink集群[AM/JM]的Client
 				client = clusterDescriptor.deployJobCluster(
 					clusterSpecification,
 					jobGraph,

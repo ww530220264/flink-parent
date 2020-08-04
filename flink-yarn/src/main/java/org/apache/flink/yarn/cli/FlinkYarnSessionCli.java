@@ -370,13 +370,14 @@ public class FlinkYarnSessionCli extends AbstractCustomCommandLine<ApplicationId
 	}
 
 	private ClusterSpecification createClusterSpecification(Configuration configuration, CommandLine cmd) {
+		// n-->Container个数 == TaskManager个数
 		if (cmd.hasOption(container.getOpt())) { // number of containers is required option!
 			LOG.info("The argument {} is deprecated in will be ignored.", container.getOpt());
 		}
 
 		// TODO: The number of task manager should be deprecated soon
 		final int numberTaskManagers;
-
+		// TaskManager个数
 		if (cmd.hasOption(container.getOpt())) {
 			numberTaskManagers = Integer.valueOf(cmd.getOptionValue(container.getOpt()));
 		} else {
@@ -470,7 +471,7 @@ public class FlinkYarnSessionCli extends AbstractCustomCommandLine<ApplicationId
 	@Override
 	public ClusterSpecification getClusterSpecification(CommandLine commandLine) throws FlinkException {
 		final Configuration effectiveConfiguration = applyCommandLineOptionsToConfiguration(commandLine);
-
+		// 创建集群启动的配置
 		return createClusterSpecification(effectiveConfiguration, commandLine);
 	}
 
@@ -496,24 +497,27 @@ public class FlinkYarnSessionCli extends AbstractCustomCommandLine<ApplicationId
 
 			effectiveConfiguration.setString(HA_CLUSTER_ID, zooKeeperNamespace);
 		}
-
+		// JobManager内存
 		if (commandLine.hasOption(jmMemory.getOpt())) {
 			String jmMemoryVal = commandLine.getOptionValue(jmMemory.getOpt());
 			if (!MemorySize.MemoryUnit.hasUnit(jmMemoryVal)) {
 				jmMemoryVal += "m";
 			}
+			// jobmanager.heap.size
 			effectiveConfiguration.setString(JobManagerOptions.JOB_MANAGER_HEAP_MEMORY, jmMemoryVal);
 		}
-
+		// TaskManager内存
 		if (commandLine.hasOption(tmMemory.getOpt())) {
 			String tmMemoryVal = commandLine.getOptionValue(tmMemory.getOpt());
 			if (!MemorySize.MemoryUnit.hasUnit(tmMemoryVal)) {
 				tmMemoryVal += "m";
 			}
+			// taskmanager.heap.size
 			effectiveConfiguration.setString(TaskManagerOptions.TASK_MANAGER_HEAP_MEMORY, tmMemoryVal);
 		}
-
+		// slot个数
 		if (commandLine.hasOption(slots.getOpt())) {
+			// taskmanager.numberOfTaskSlots
 			effectiveConfiguration.setInteger(TaskManagerOptions.NUM_TASK_SLOTS, Integer.parseInt(commandLine.getOptionValue(slots.getOpt())));
 		}
 
@@ -525,6 +529,7 @@ public class FlinkYarnSessionCli extends AbstractCustomCommandLine<ApplicationId
 	}
 
 	private boolean isYarnPropertiesFileMode(CommandLine commandLine) {
+		// 参数m 要连接到JobManager的地址
 		boolean canApplyYarnProperties = !commandLine.hasOption(addressOption.getOpt());
 
 		if (canApplyYarnProperties) {
@@ -980,6 +985,7 @@ public class FlinkYarnSessionCli extends AbstractCustomCommandLine<ApplicationId
 			Configuration configuration,
 			YarnConfiguration yarnConfiguration,
 			String configurationDirectory) {
+		// 创建YarnClient
 		final YarnClient yarnClient = YarnClient.createYarnClient();
 		yarnClient.init(yarnConfiguration);
 		yarnClient.start();

@@ -158,7 +158,7 @@ public class RestClusterClient<T> extends ClusterClient<T> implements NewCluster
 		this(
 			config,
 			null,
-			clusterId,
+			clusterId, // Application ID
 			new ExponentialWaitStrategy(10L, 2000L),
 			null);
 	}

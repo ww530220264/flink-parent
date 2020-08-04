@@ -467,6 +467,7 @@ public abstract class AbstractYarnClusterDescriptor implements ClusterDescriptor
 	 * @param jobGraph A job graph which is deployed with the Flink cluster, {@code null} if none
 	 * @param detached True if the cluster should be started in detached mode
 	 */
+	// 阻塞,直到ApplicationMaster/JobManager在yarn上部署成功
 	protected ClusterClient<ApplicationId> deployInternal(
 			ClusterSpecification clusterSpecification,
 			String applicationName,
@@ -495,7 +496,7 @@ public abstract class AbstractYarnClusterDescriptor implements ClusterDescriptor
 		isReadyForDeployment(clusterSpecification);
 
 		// ------------------ Check if the specified queue exists --------------------
-
+		// queue是否存在
 		checkYarnQueues(yarnClient);
 
 		// ------------------ Add dynamic properties to local flinkConfiguraton ------
@@ -507,11 +508,13 @@ public abstract class AbstractYarnClusterDescriptor implements ClusterDescriptor
 		// ------------------ Check if the YARN ClusterClient has the requested resources --------------
 
 		// Create application via yarnClient
+		// 通过yarnClient创建Application
 		final YarnClientApplication yarnApplication = yarnClient.createApplication();
+		// 获取响应
 		final GetNewApplicationResponse appResponse = yarnApplication.getNewApplicationResponse();
-
+		// RM可分配的最大资源容量
 		Resource maxRes = appResponse.getMaximumResourceCapability();
-
+		// 集群空闲内存
 		final ClusterResourceDescription freeClusterMem;
 		try {
 			freeClusterMem = getCurrentFreeClusterResources(yarnClient);
@@ -519,11 +522,12 @@ public abstract class AbstractYarnClusterDescriptor implements ClusterDescriptor
 			failSessionDuringDeployment(yarnClient, yarnApplication);
 			throw new YarnDeploymentException("Could not retrieve information about free cluster resources.", e);
 		}
-
+		// 最小申请资源
 		final int yarnMinAllocationMB = yarnConfiguration.getInt(YarnConfiguration.RM_SCHEDULER_MINIMUM_ALLOCATION_MB, 0);
 
 		final ClusterSpecification validClusterSpecification;
 		try {
+			// 校验集群资源
 			validClusterSpecification = validateClusterResources(
 				clusterSpecification,
 				yarnMinAllocationMB,
@@ -537,11 +541,11 @@ public abstract class AbstractYarnClusterDescriptor implements ClusterDescriptor
 		LOG.info("Cluster specification: {}", validClusterSpecification);
 
 		final ClusterEntrypoint.ExecutionMode executionMode = detached ?
-			ClusterEntrypoint.ExecutionMode.DETACHED
+			ClusterEntrypoint.ExecutionMode.DETACHED // 分离模式
 			: ClusterEntrypoint.ExecutionMode.NORMAL;
 
 		flinkConfiguration.setString(ClusterEntrypoint.EXECUTION_MODE, executionMode.toString());
-
+		// 准备AM Container 提交 Application
 		ApplicationReport report = startAppMaster(
 			flinkConfiguration,
 			applicationName,
@@ -550,7 +554,7 @@ public abstract class AbstractYarnClusterDescriptor implements ClusterDescriptor
 			yarnClient,
 			yarnApplication,
 			validClusterSpecification);
-
+		// AM/JM host & port
 		String host = report.getHost();
 		int port = report.getRpcPort();
 
@@ -562,6 +566,7 @@ public abstract class AbstractYarnClusterDescriptor implements ClusterDescriptor
 		flinkConfiguration.setInteger(RestOptions.PORT, port);
 
 		// the Flink cluster is deployed in YARN. Represent cluster
+		// 创建FLink集群的客户端
 		return createYarnClusterClient(
 			this,
 			validClusterSpecification.getNumberTaskManagers(),
@@ -577,9 +582,9 @@ public abstract class AbstractYarnClusterDescriptor implements ClusterDescriptor
 		Resource maximumResourceCapability,
 		ClusterResourceDescription freeClusterResources) throws YarnDeploymentException {
 
-		int taskManagerCount = clusterSpecification.getNumberTaskManagers();
-		int jobManagerMemoryMb = clusterSpecification.getMasterMemoryMB();
-		int taskManagerMemoryMb = clusterSpecification.getTaskManagerMemoryMB();
+		int taskManagerCount = clusterSpecification.getNumberTaskManagers(); // TM个数
+		int jobManagerMemoryMb = clusterSpecification.getMasterMemoryMB();	// JM内存
+		int taskManagerMemoryMb = clusterSpecification.getTaskManagerMemoryMB();	// TM内存
 
 		if (jobManagerMemoryMb < yarnMinAllocationMB || taskManagerMemoryMb < yarnMinAllocationMB) {
 			LOG.warn("The JobManager or TaskManager memory is below the smallest possible YARN Container size. "
@@ -789,7 +794,7 @@ public abstract class AbstractYarnClusterDescriptor implements ClusterDescriptor
 		// ship list that enables reuse of resources for task manager containers
 		StringBuilder envShipFileList = new StringBuilder();
 
-		// upload and register ship files
+		// upload and register ship files 上传和注册文件
 		List<String> systemClassPaths = uploadAndRegisterFiles(
 			systemShipFiles,
 			fs,
@@ -958,7 +963,7 @@ public abstract class AbstractYarnClusterDescriptor implements ClusterDescriptor
 				homeDir,
 				"");
 		}
-
+		// 设置AM Container
 		final ContainerLaunchContext amContainer = setupApplicationMasterContainer(
 			yarnClusterEntrypoint,
 			hasLogback,
@@ -1042,6 +1047,7 @@ public abstract class AbstractYarnClusterDescriptor implements ClusterDescriptor
 		Thread deploymentFailureHook = new DeploymentFailureHook(yarnClient, yarnApplication, yarnFilesDir);
 		Runtime.getRuntime().addShutdownHook(deploymentFailureHook);
 		LOG.info("Submitting application master " + appId);
+		// 提交Application
 		yarnClient.submitApplication(appContext);
 
 		LOG.info("Waiting for the cluster to be allocated");
@@ -1588,7 +1594,7 @@ public abstract class AbstractYarnClusterDescriptor implements ClusterDescriptor
 		if (hasKrb5) {
 			javaOpts += " -Djava.security.krb5.conf=krb5.conf";
 		}
-
+		// 为AM设置Container'的启动上下文
 		// Set up the container launch context for the application master
 		ContainerLaunchContext amContainer = Records.newRecord(ContainerLaunchContext.class);
 

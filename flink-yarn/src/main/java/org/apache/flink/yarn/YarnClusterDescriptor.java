@@ -69,12 +69,14 @@ public class YarnClusterDescriptor extends AbstractYarnClusterDescriptor {
 		boolean detached) throws ClusterDeploymentException {
 
 		// this is required because the slots are allocated lazily
-		jobGraph.setAllowQueuedScheduling(true);
+		jobGraph.setAllowQueuedScheduling(true); // 允许延迟调度
 
 		try {
 			return deployInternal(
 				clusterSpecification,
 				"Flink per-job cluster",
+				// YarnJobClusterEntrypoint.class.getName()
+				// 入口,启动ApplicationMaster
 				getYarnJobClusterEntrypoint(),
 				jobGraph,
 				detached);

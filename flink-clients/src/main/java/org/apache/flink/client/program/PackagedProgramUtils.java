@@ -83,6 +83,7 @@ public class PackagedProgramUtils {
 		final JobGraph jobGraph;
 
 		if (flinkPlan instanceof StreamingPlan) {
+			// 获取JobGraph
 			jobGraph = ((StreamingPlan) flinkPlan).getJobGraph(jobID);
 			jobGraph.setSavepointRestoreSettings(packagedProgram.getSavepointSettings());
 		} else {
@@ -92,12 +93,13 @@ public class PackagedProgramUtils {
 
 		for (URL url : packagedProgram.getAllLibraries()) {
 			try {
+				// 添加在TaskManager上运行所需的jar包路径
 				jobGraph.addJar(new Path(url.toURI()));
 			} catch (URISyntaxException e) {
 				throw new ProgramInvocationException("Invalid URL for jar file: " + url + '.', jobGraph.getJobID(), e);
 			}
 		}
-
+		// 设置类路径
 		jobGraph.setClasspaths(packagedProgram.getClasspaths());
 
 		return jobGraph;
