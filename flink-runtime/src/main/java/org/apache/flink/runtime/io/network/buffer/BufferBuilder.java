@@ -126,6 +126,7 @@ public class BufferBuilder {
 	 * Holds a reference to the current writer position. Negative values indicate that writer ({@link BufferBuilder}
 	 * has finished. Value {@code Integer.MIN_VALUE} represents finished empty buffer.
 	 */
+	// 引用当前writer index
 	@ThreadSafe
 	interface PositionMarker {
 		int FINISHED_EMPTY = Integer.MIN_VALUE;

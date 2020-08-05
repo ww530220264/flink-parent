@@ -59,10 +59,10 @@ public class MemoryManager {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MemoryManager.class);
 	/** The default memory page size. Currently set to 32 KiBytes. */
-	public static final int DEFAULT_PAGE_SIZE = 32 * 1024;
+	public static final int DEFAULT_PAGE_SIZE = 32 * 1024; // page大小 32KB
 
 	/** The minimal memory page size. Currently set to 4 KiBytes. */
-	public static final int MIN_PAGE_SIZE = 4 * 1024;
+	public static final int MIN_PAGE_SIZE = 4 * 1024; // 最小page大小 4KB
 
 	// ------------------------------------------------------------------------
 
@@ -71,18 +71,18 @@ public class MemoryManager {
 
 	/** The memory pool from which we draw memory segments. Specific to on-heap or off-heap memory */
 	private final MemoryPool memoryPool;
-
+	// 为每个内存owner分配的内存段
 	/** Memory segments allocated per memory owner. */
 	private final HashMap<Object, Set<MemorySegment>> allocatedSegments;
 
 	/** The type of memory governed by this memory manager. */
-	private final MemoryType memoryType;
+	private final MemoryType memoryType; // HEAP|OFFHEAP
 
 	/** Mask used to round down sizes to multiples of the page size. */
 	private final long roundingMask;
 
 	/** The size of the memory segments. */
-	private final int pageSize;
+	private final int pageSize; // 内存页大小
 
 	/** The initial total size, for verification. */
 	private final int totalNumPages;
@@ -109,6 +109,7 @@ public class MemoryManager {
 	 * @param memorySize The total size of the memory to be managed by this memory manager.
 	 * @param numberOfSlots The number of slots of the task manager.
 	 */
+	// 总内存大小 TaskManager上的slot的个数
 	public MemoryManager(long memorySize, int numberOfSlots) {
 		this(memorySize, numberOfSlots, DEFAULT_PAGE_SIZE, MemoryType.HEAP, true);
 	}
@@ -139,29 +140,29 @@ public class MemoryManager {
 			throw new IllegalArgumentException("The given page size is not a power of two.");
 		}
 
-		this.memoryType = memoryType;
-		this.memorySize = memorySize;
-		this.numberOfSlots = numberOfSlots;
+		this.memoryType = memoryType; // 内存类型
+		this.memorySize = memorySize; // 总内存大小
+		this.numberOfSlots = numberOfSlots; // TaskManager上slot个数
 
 		// assign page size and bit utilities
-		this.pageSize = pageSize;
+		this.pageSize = pageSize; // 内存页大小
 		this.roundingMask = ~((long) (pageSize - 1));
 
-		final long numPagesLong = memorySize / pageSize;
+		final long numPagesLong = memorySize / pageSize; // 总页数
 		if (numPagesLong > Integer.MAX_VALUE) {
 			throw new IllegalArgumentException("The given number of memory bytes (" + memorySize
 					+ ") corresponds to more than MAX_INT pages.");
 		}
-		this.totalNumPages = (int) numPagesLong;
+		this.totalNumPages = (int) numPagesLong; // 总页数
 		if (this.totalNumPages < 1) {
 			throw new IllegalArgumentException("The given amount of memory amounted to less than one page.");
 		}
 
 		this.allocatedSegments = new HashMap<Object, Set<MemorySegment>>();
-		this.isPreAllocated = preAllocateMemory;
+		this.isPreAllocated = preAllocateMemory; // 是否预先申请
 
-		this.numNonAllocatedPages = preAllocateMemory ? 0 : this.totalNumPages;
-		final int memToAllocate = preAllocateMemory ? this.totalNumPages : 0;
+		this.numNonAllocatedPages = preAllocateMemory ? 0 : this.totalNumPages; // 待申请内存页个数
+		final int memToAllocate = preAllocateMemory ? this.totalNumPages : 0; // 将申请的内存页个数
 
 		switch (memoryType) {
 			case HEAP:
@@ -563,6 +564,8 @@ public class MemoryManager {
 	 * @param fraction the fraction of the total memory per slot
 	 * @return The number of pages to which
 	 */
+	// fraction---TaskManager上所有slot占用总内存的比例
+	// 返回每个TaskManager上每个slot占用的内存page个数
 	public int computeNumberOfPages(double fraction) {
 		if (fraction <= 0 || fraction > 1) {
 			throw new IllegalArgumentException("The fraction of memory to allocate must within (0, 1].");
@@ -577,6 +580,7 @@ public class MemoryManager {
 	 * @param fraction The fraction of the memory of the task slot.
 	 * @return The number of pages corresponding to the memory fraction.
 	 */
+	// 每个slot内存大小 == 每个slot page个数 * pageSize
 	public long computeMemorySize(double fraction) {
 		return pageSize * (long) computeNumberOfPages(fraction);
 	}
@@ -614,7 +618,8 @@ public class MemoryManager {
 		private final ArrayDeque<byte[]> availableMemory;
 
 		private final int segmentSize;
-
+		// 内存片段个数
+		// 片段大小
 		HybridHeapMemoryPool(int numInitialSegments, int segmentSize) {
 			this.availableMemory = new ArrayDeque<>(numInitialSegments);
 			this.segmentSize = segmentSize;

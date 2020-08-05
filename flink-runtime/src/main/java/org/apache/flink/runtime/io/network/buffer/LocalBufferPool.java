@@ -212,7 +212,7 @@ class LocalBufferPool implements BufferPool {
 	public Buffer requestBufferBlocking() throws IOException, InterruptedException {
 		return toBuffer(requestMemorySegment(true));
 	}
-
+	// 这个方法来检测线程是否卡在这里,用来统计背压的信息
 	@Override
 	public BufferBuilder requestBufferBuilderBlocking() throws IOException, InterruptedException {
 		return toBufferBuilder(requestMemorySegment(true));

@@ -755,7 +755,7 @@ class TaskManager(
                     remainingNumSamples - 1,
                     currentTraces,
                     sender)
-
+                  // 继续给自己发送消息
                   context.system.scheduler.scheduleOnce(
                     new FiniteDuration(delayBetweenSamples.getSize, delayBetweenSamples.getUnit),
                     self,
@@ -796,6 +796,7 @@ class TaskManager(
       *                           trace.
       * @return Stack trace of the running task.
       */
+    // 获取堆栈信息,给检测被压提供统计信息
     def getStackTrace(
       executionId: ExecutionAttemptID,
       maxStackTraceDepth: Int): Option[Array[StackTraceElement]] = {
@@ -808,6 +809,10 @@ class TaskManager(
         if (maxStackTraceDepth > 0) {
           Option(util.Arrays.copyOfRange(stackTrace, 0, maxStackTraceDepth.min(stackTrace.length)))
         } else {
+          System.err.println(
+            s"""-----------获取堆栈信息----------
+               |${task.getTaskInfo}
+               |${stackTrace}""".stripMargin)
           Option(stackTrace)
         }
       } else {

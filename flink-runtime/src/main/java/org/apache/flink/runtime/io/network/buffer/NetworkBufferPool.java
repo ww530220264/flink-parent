@@ -125,7 +125,7 @@ public class NetworkBufferPool implements BufferPoolFactory {
 		// making the availableMemorySegments queue and its contained object reclaimable
 		availableMemorySegments.add(checkNotNull(segment));
 	}
-
+	// 请求numRequiredBuffers个内存片段
 	public List<MemorySegment> requestMemorySegments(int numRequiredBuffers) throws IOException {
 		checkArgument(numRequiredBuffers > 0, "The number of required buffers should be larger than 0.");
 
@@ -143,11 +143,11 @@ public class NetworkBufferPool implements BufferPoolFactory {
 						totalNumberOfMemorySegments - numTotalRequiredBuffers,
 						totalNumberOfMemorySegments,
 						memorySegmentSize,
-						TaskManagerOptions.NETWORK_BUFFERS_MEMORY_FRACTION.key(),
-						TaskManagerOptions.NETWORK_BUFFERS_MEMORY_MIN.key(),
-						TaskManagerOptions.NETWORK_BUFFERS_MEMORY_MAX.key()));
+						TaskManagerOptions.NETWORK_BUFFERS_MEMORY_FRACTION.key(), // 占用JVM内存比例
+						TaskManagerOptions.NETWORK_BUFFERS_MEMORY_MIN.key(),	// 最小内存大小,覆盖上面
+						TaskManagerOptions.NETWORK_BUFFERS_MEMORY_MAX.key()));	// 最大内存大小,覆盖上面
 			}
-
+			// 已被申请的buffer个数
 			this.numTotalRequiredBuffers += numRequiredBuffers;
 
 			try {
@@ -251,7 +251,8 @@ public class NetworkBufferPool implements BufferPoolFactory {
 	// ------------------------------------------------------------------------
 	// BufferPoolFactory
 	// ------------------------------------------------------------------------
-
+	// numRequiredBuffers--该pool中buffer个数的最小值
+	// maxUsedBuffers------该pool提供的buffer个数的最大值
 	@Override
 	public BufferPool createBufferPool(int numRequiredBuffers, int maxUsedBuffers) throws IOException {
 		return createBufferPool(numRequiredBuffers, maxUsedBuffers, Optional.empty());
@@ -289,10 +290,10 @@ public class NetworkBufferPool implements BufferPoolFactory {
 			LocalBufferPool localBufferPool =
 				new LocalBufferPool(this, numRequiredBuffers, maxUsedBuffers, owner);
 
-			allBufferPools.add(localBufferPool);
+			allBufferPools.add(localBufferPool); // 添加该pool
 
 			try {
-				redistributeBuffers();
+				redistributeBuffers(); // 重新分布networkpool中的buffers到各个localbufferpool中
 			} catch (IOException e) {
 				try {
 					destroyBufferPool(localBufferPool);
@@ -346,11 +347,13 @@ public class NetworkBufferPool implements BufferPoolFactory {
 		assert Thread.holdsLock(factoryLock);
 
 		// All buffers, which are not among the required ones
+		// 可用内存片段数量
 		final int numAvailableMemorySegment = totalNumberOfMemorySegments - numTotalRequiredBuffers;
 
 		if (numAvailableMemorySegment == 0) {
 			// in this case, we need to redistribute buffers so that every pool gets its minimum
 			for (LocalBufferPool bufferPool : allBufferPools) {
+				// 分配最小的个数
 				bufferPool.setNumBuffers(bufferPool.getNumberOfRequiredMemorySegments());
 			}
 			return;
@@ -368,12 +371,12 @@ public class NetworkBufferPool implements BufferPoolFactory {
 
 		for (LocalBufferPool bufferPool : allBufferPools) {
 			int excessMax = bufferPool.getMaxNumberOfMemorySegments() -
-				bufferPool.getNumberOfRequiredMemorySegments();
-			totalCapacity += Math.min(numAvailableMemorySegment, excessMax);
+				bufferPool.getNumberOfRequiredMemorySegments(); // 还可以容纳内存片段的个数
+			totalCapacity += Math.min(numAvailableMemorySegment, excessMax); // 当前可用内存片段个数和该pool可容纳内存片段个数较小值
 		}
 
 		// no capacity to receive additional buffers?
-		if (totalCapacity == 0) {
+		if (totalCapacity == 0) { // 每个local pool都满了
 			return; // necessary to avoid div by zero when nothing to re-distribute
 		}
 
@@ -381,7 +384,7 @@ public class NetworkBufferPool implements BufferPoolFactory {
 		// guaranteed to be within the 'int' domain
 		// (we use a checked downCast to handle possible bugs more gracefully).
 		final int memorySegmentsToDistribute = MathUtils.checkedDownCast(
-				Math.min(numAvailableMemorySegment, totalCapacity));
+				Math.min(numAvailableMemorySegment, totalCapacity)); // 需要被分布的片段个数
 
 		long totalPartsUsed = 0; // of totalCapacity
 		int numDistributedMemorySegment = 0;
@@ -390,7 +393,7 @@ public class NetworkBufferPool implements BufferPoolFactory {
 				bufferPool.getNumberOfRequiredMemorySegments();
 
 			// shortcut
-			if (excessMax == 0) {
+			if (excessMax == 0) { // 满了
 				continue;
 			}
 
@@ -399,6 +402,7 @@ public class NetworkBufferPool implements BufferPoolFactory {
 			// avoid remaining buffers by looking at the total capacity that should have been
 			// re-distributed up until here
 			// the downcast will always succeed, because both arguments of the subtraction are in the 'int' domain
+			// 给当前pool分配的片段个数
 			final int mySize = MathUtils.checkedDownCast(
 					memorySegmentsToDistribute * totalPartsUsed / totalCapacity - numDistributedMemorySegment);
 

@@ -157,6 +157,7 @@ public class StackTraceSampleCoordinator {
 
 			// Trigger all samples
 			for (Execution execution: executions) {
+				// 采样每个execution task的堆栈信息
 				final CompletableFuture<StackTraceSampleResponse> stackTraceSampleFuture = execution.requestStackTraceSample(
 					sampleId,
 					numSamples,
@@ -233,7 +234,7 @@ public class StackTraceSampleCoordinator {
 
 	/**
 	 * Collects stack traces of a task.
-	 *
+	 * 收集任务的堆栈信息
 	 * @param sampleId    ID of the sample.
 	 * @param executionId ID of the sampled task.
 	 * @param stackTraces Stack traces of the sampled task.
@@ -260,7 +261,7 @@ public class StackTraceSampleCoordinator {
 			if (pending != null) {
 				pending.collectStackTraces(executionId, stackTraces);
 
-				// Publish the sample
+				// Publish the sample 完成之后,发布采样
 				if (pending.isComplete()) {
 					pendingSamples.remove(sampleId);
 					rememberRecentSampleId(sampleId);
@@ -357,7 +358,7 @@ public class StackTraceSampleCoordinator {
 			if (isDiscarded) {
 				throw new IllegalStateException("Discarded");
 			}
-
+			// 移除之前的
 			if (pendingTasks.remove(executionId)) {
 				stackTracesByTask.put(executionId, Collections.unmodifiableList(stackTraces));
 			} else if (isComplete()) {

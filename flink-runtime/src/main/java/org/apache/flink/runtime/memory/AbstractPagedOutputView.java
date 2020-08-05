@@ -31,7 +31,7 @@ import java.io.UTFDataFormatException;
  * encoding methods to write data to a page and detect page boundary crossing. The concrete sub classes must
  * implement the methods to collect the current page and provide the next memory page once the boundary is crossed.
  *
- * <p>The paging assumes that all memory segments are of the same size.
+ * <p>The paging assumes that all memory segments are of the same size. // 所有内存片段都是相同的大小
  */
 public abstract class AbstractPagedOutputView implements DataOutputView {
 
@@ -183,9 +183,9 @@ public abstract class AbstractPagedOutputView implements DataOutputView {
 			this.positionInSegment += len;
 		}
 		else {
-			if (remaining == 0) {
-				advance();
-				remaining = this.segmentSize - this.positionInSegment;
+			if (remaining == 0) { // 可用空间 == 0
+				advance();	// 重新获取一个内存segment
+				remaining = this.segmentSize - this.positionInSegment; // 当前可用空间
 			}
 			while (true) {
 				int toPut = Math.min(remaining, len);
@@ -195,7 +195,7 @@ public abstract class AbstractPagedOutputView implements DataOutputView {
 
 				if (len > 0) {
 					this.positionInSegment = this.segmentSize;
-					advance();
+					advance(); // 重新获取一个内存segment
 					remaining = this.segmentSize - this.positionInSegment;
 				}
 				else {
@@ -210,7 +210,7 @@ public abstract class AbstractPagedOutputView implements DataOutputView {
 	public void writeBoolean(boolean v) throws IOException {
 		writeByte(v ? 1 : 0);
 	}
-
+	// 1个字节
 	@Override
 	public void writeByte(int v) throws IOException {
 		if (this.positionInSegment < this.segmentSize) {
@@ -221,7 +221,7 @@ public abstract class AbstractPagedOutputView implements DataOutputView {
 			writeByte(v);
 		}
 	}
-
+	// 2个字节
 	@Override
 	public void writeShort(int v) throws IOException {
 		if (this.positionInSegment < this.segmentSize - 1) {
@@ -237,7 +237,7 @@ public abstract class AbstractPagedOutputView implements DataOutputView {
 			writeByte(v);
 		}
 	}
-
+	// 2个字节
 	@Override
 	public void writeChar(int v) throws IOException {
 		if (this.positionInSegment < this.segmentSize - 1) {
@@ -253,7 +253,7 @@ public abstract class AbstractPagedOutputView implements DataOutputView {
 			writeByte(v);
 		}
 	}
-
+	// 4个字节
 	@Override
 	public void writeInt(int v) throws IOException {
 		if (this.positionInSegment < this.segmentSize - 3) {
@@ -271,7 +271,7 @@ public abstract class AbstractPagedOutputView implements DataOutputView {
 			writeByte(v);
 		}
 	}
-
+	// 8个字节
 	@Override
 	public void writeLong(long v) throws IOException {
 		if (this.positionInSegment < this.segmentSize - 7) {

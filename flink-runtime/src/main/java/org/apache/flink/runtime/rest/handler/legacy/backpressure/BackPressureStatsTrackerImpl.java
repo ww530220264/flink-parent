@@ -48,7 +48,7 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 
 /**
  * Back pressure statistics tracker.
- * 背压是被采样运行中的人物决定的,如果一个人物因为背压而变慢,它将被卡在对LocalBufferPool的内存请求中
+ * 背压是被采样运行中的任务决定的,如果一个任务因为背压而变慢,它将被卡在对LocalBufferPool的内存请求中
  * <p>Back pressure is determined by sampling running tasks. If a task is
  * slowed down by back pressure it will be stuck in memory requests to a
  * {@link org.apache.flink.runtime.io.network.buffer.LocalBufferPool}.
@@ -68,7 +68,7 @@ public class BackPressureStatsTrackerImpl implements BackPressureStatsTracker {
 	private static final Logger LOG = LoggerFactory.getLogger(BackPressureStatsTrackerImpl.class);
 
 	/** Maximum stack trace depth for samples. */
-	static final int MAX_STACK_TRACE_DEPTH = 3;
+	static final int MAX_STACK_TRACE_DEPTH = 3; // 堆栈深度
 
 	/** Expected class name for back pressure indicating stack trace element. */
 	static final String EXPECTED_CLASS_NAME = "org.apache.flink.runtime.io.network.buffer.LocalBufferPool";
@@ -258,6 +258,7 @@ public class BackPressureStatsTrackerImpl implements BackPressureStatsTracker {
 
 	/**
 	 * Callback on completed stack trace sample.
+	 * 采样堆栈信息完成回调方法
 	 */
 	class StackTraceSampleCompletionCallback implements BiFunction<StackTraceSample, Throwable, Void> {
 
@@ -280,6 +281,7 @@ public class BackPressureStatsTrackerImpl implements BackPressureStatsTracker {
 					if (jobState.isGloballyTerminalState()) {
 						LOG.debug("Ignoring sample, because job is in state " + jobState + ".");
 					} else if (stackTraceSample != null) {
+						// 构建Operator背压统计信息:采样序号/采样结束时间/本次采样各个子任务背压比率
 						OperatorBackPressureStats stats = createStatsFromSample(stackTraceSample);
 						operatorStatsCache.put(vertex, stats);
 					} else {
@@ -324,6 +326,7 @@ public class BackPressureStatsTrackerImpl implements BackPressureStatsTracker {
 
 			// Ratio of blocked samples to total samples per sub task. Array
 			// position corresponds to sub task index.
+			// 每个子任务背压的 每个子任务卡住的样本数量/每个子任务总的样本数量
 			double[] backPressureRatio = new double[traces.size()];
 
 			for (Entry<ExecutionAttemptID, List<StackTraceElement[]>> entry : traces.entrySet()) {
@@ -334,7 +337,7 @@ public class BackPressureStatsTrackerImpl implements BackPressureStatsTracker {
 				for (StackTraceElement[] trace : taskTraces) {
 					for (int i = trace.length - 1; i >= 0; i--) {
 						StackTraceElement elem = trace[i];
-
+						// LocalBufferPool && requestBufferBuilderBlocking
 						if (elem.getClassName().equals(EXPECTED_CLASS_NAME) &&
 								elem.getMethodName().equals(EXPECTED_METHOD_NAME)) {
 

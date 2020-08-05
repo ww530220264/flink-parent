@@ -62,7 +62,7 @@ public class JobVertexBackPressureHandler extends AbstractRestHandler<RestfulGat
 		final JobID jobId = request.getPathParameter(JobIDPathParameter.class);
 		final JobVertexID jobVertexId = request.getPathParameter(JobVertexIdPathParameter.class);
 		return gateway
-			.requestOperatorBackPressureStats(jobId, jobVertexId)
+			.requestOperatorBackPressureStats(jobId, jobVertexId) // 获取JobVertex子任务背压统计信息
 			.thenApply(
 				operatorBackPressureStats ->
 					operatorBackPressureStats.getOperatorBackPressureStats().map(
@@ -74,11 +74,13 @@ public class JobVertexBackPressureHandler extends AbstractRestHandler<RestfulGat
 			final OperatorBackPressureStats operatorBackPressureStats) {
 		return new JobVertexBackPressureInfo(
 			JobVertexBackPressureInfo.VertexBackPressureStatus.OK,
-			getBackPressureLevel(operatorBackPressureStats.getMaxBackPressureRatio()),
-			operatorBackPressureStats.getEndTimestamp(),
+			getBackPressureLevel(operatorBackPressureStats.getMaxBackPressureRatio()), // 根据最大背压比率获取背压等级
+			operatorBackPressureStats.getEndTimestamp(), // 采样结束时间
 			IntStream.range(0, operatorBackPressureStats.getNumberOfSubTasks())
 				.mapToObj(subtask -> {
+					// subtask对应子任务背压比率
 					final double backPressureRatio = operatorBackPressureStats.getBackPressureRatio(subtask);
+					// 获取每个子任务背压信息
 					return new JobVertexBackPressureInfo.SubtaskBackPressureInfo(
 						subtask,
 						getBackPressureLevel(backPressureRatio),

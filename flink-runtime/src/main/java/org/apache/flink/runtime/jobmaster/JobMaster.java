@@ -996,7 +996,7 @@ public class JobMaster extends FencedRpcEndpoint<JobMasterId> implements JobMast
 			return FutureUtils.completedExceptionally(new FlinkException("JobVertexID not found " +
 				jobVertexId));
 		}
-
+		// 获取该JobVertex的子任务的背压采样统计信息
 		final Optional<OperatorBackPressureStats> operatorBackPressureStats =
 			backPressureStatsTracker.getOperatorBackPressureStats(jobVertex);
 		return CompletableFuture.completedFuture(OperatorBackPressureStatsResponse.of(

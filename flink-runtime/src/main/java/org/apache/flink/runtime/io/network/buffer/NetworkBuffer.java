@@ -105,12 +105,12 @@ public class NetworkBuffer extends AbstractReferenceCountedByteBuf implements Bu
 	 * 		current size of data in the buffer, i.e. the writer index to set
 	 */
 	public NetworkBuffer(MemorySegment memorySegment, BufferRecycler recycler, boolean isBuffer, int size) {
-		super(memorySegment.size());
+		super(memorySegment.size()); // 设置最大容量和引用计数+1
 		this.memorySegment = checkNotNull(memorySegment);
 		this.recycler = checkNotNull(recycler);
 		this.isBuffer = isBuffer;
 		this.currentSize = memorySegment.size();
-		setSize(size);
+		setSize(size); // 设置writerIndex
 	}
 
 	@Override
@@ -151,7 +151,7 @@ public class NetworkBuffer extends AbstractReferenceCountedByteBuf implements Bu
 	public boolean isRecycled() {
 		return refCnt() == 0;
 	}
-
+	// 引用计数+1
 	@Override
 	public NetworkBuffer retainBuffer() {
 		return (NetworkBuffer) super.retain();

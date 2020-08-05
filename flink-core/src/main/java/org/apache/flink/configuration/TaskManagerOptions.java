@@ -259,7 +259,7 @@ public class TaskManagerOptions {
 	 * Fraction of JVM memory to use for network buffers.
 	 */
 	public static final ConfigOption<Float> NETWORK_BUFFERS_MEMORY_FRACTION =
-			key("taskmanager.network.memory.fraction")
+			key("taskmanager.network.memory.fraction") // network buffers内存占用JVM内存的比例
 			.defaultValue(0.1f)
 			.withDescription("Fraction of JVM memory to use for network buffers. This determines how many streaming" +
 				" data exchange channels a TaskManager can have at the same time and how well buffered the channels" +
@@ -270,6 +270,7 @@ public class TaskManagerOptions {
 	/**
 	 * Minimum memory size for network buffers.
 	 */
+	// network buffer最小内存大小,会覆盖上面的
 	public static final ConfigOption<String> NETWORK_BUFFERS_MEMORY_MIN =
 			key("taskmanager.network.memory.min")
 			.defaultValue("64mb")
@@ -278,6 +279,7 @@ public class TaskManagerOptions {
 	/**
 	 * Maximum memory size for network buffers.
 	 */
+	// network buffer最大内存大小,会覆盖上面的
 	public static final ConfigOption<String> NETWORK_BUFFERS_MEMORY_MAX =
 			key("taskmanager.network.memory.max")
 			.defaultValue("1gb")
@@ -288,6 +290,7 @@ public class TaskManagerOptions {
 	 *
 	 * <p>Reasoning: 1 buffer for in-flight data in the subpartition + 1 buffer for parallel serialization.
 	 */
+	// 每个channel的buffer个数,建议至少2个
 	public static final ConfigOption<Integer> NETWORK_BUFFERS_PER_CHANNEL =
 			key("taskmanager.network.memory.buffers-per-channel")
 			.defaultValue(2)

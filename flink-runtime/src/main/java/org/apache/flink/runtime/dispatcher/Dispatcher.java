@@ -471,6 +471,7 @@ public abstract class Dispatcher extends FencedRpcEndpoint<DispatcherId> impleme
 			});
 	}
 
+	// 获取JobVertex子任务背压统计信息
 	@Override
 	public CompletableFuture<OperatorBackPressureStatsResponse> requestOperatorBackPressureStats(
 			final JobID jobId,

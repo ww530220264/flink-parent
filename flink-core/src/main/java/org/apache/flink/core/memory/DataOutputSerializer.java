@@ -35,7 +35,7 @@ public class DataOutputSerializer implements DataOutputView {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DataOutputSerializer.class);
 
-	private static final int PRUNE_BUFFER_THRESHOLD = 5 * 1024 * 1024;
+	private static final int PRUNE_BUFFER_THRESHOLD = 5 * 1024 * 1024; // 5M
 
 	// ------------------------------------------------------------------------
 

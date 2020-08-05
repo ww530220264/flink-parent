@@ -21,7 +21,7 @@ package org.apache.flink.runtime.io.network.buffer;
 import java.io.IOException;
 
 /**
- * A dynamically sized buffer pool. // 动态大写的缓冲池
+ * A dynamically sized buffer pool. // 动态的缓冲池
  */
 public interface BufferPool extends BufferProvider, BufferRecycler {
 

@@ -52,7 +52,7 @@ public class ByteArrayOutputStreamWithPos extends OutputStream {
 
 	private void increaseCapacity(int requiredCapacity) {
 		int oldCapacity = buffer.length;
-		int newCapacity = oldCapacity << 1;
+		int newCapacity = oldCapacity << 1; // 先扩一倍
 		if (newCapacity - requiredCapacity < 0) {
 			newCapacity = requiredCapacity;
 		}
