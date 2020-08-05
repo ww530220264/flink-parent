@@ -301,7 +301,7 @@ public class TaskManagerServices {
 		// it strictly needs to happen AFTER the network stack has been initialized
 
 		// check if a value has been configured
-		long configuredMemory = taskManagerServicesConfiguration.getConfiguredMemory(); // 获取配置的内存大小
+		long configuredMemory = taskManagerServicesConfiguration.getConfiguredMemory(); // 获取配置taskmanager.memory.size[管理内存]的内存大小
 
 		MemoryType memType = taskManagerServicesConfiguration.getMemoryType(); // 内存类型:HEAP/OFF_HEAP
 

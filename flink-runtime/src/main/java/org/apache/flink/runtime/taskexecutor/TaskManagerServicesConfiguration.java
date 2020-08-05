@@ -237,8 +237,9 @@ public class TaskManagerServicesConfiguration {
 				parseQueryableStateConfiguration(configuration);
 
 		// extract memory settings
+		// 配置的taskmanager.memory.size
 		long configuredMemory;
-		String managedMemorySizeDefaultVal = TaskManagerOptions.MANAGED_MEMORY_SIZE.defaultValue();
+		String managedMemorySizeDefaultVal = TaskManagerOptions.MANAGED_MEMORY_SIZE.defaultValue(); // 默认0
 		if (!configuration.getString(TaskManagerOptions.MANAGED_MEMORY_SIZE).equals(managedMemorySizeDefaultVal)) {
 			try {
 				configuredMemory = MemorySize.parse(configuration.getString(TaskManagerOptions.MANAGED_MEMORY_SIZE), MEGA_BYTES).getMebiBytes();
@@ -267,7 +268,7 @@ public class TaskManagerServicesConfiguration {
 		}
 
 		boolean preAllocateMemory = configuration.getBoolean(TaskManagerOptions.MANAGED_MEMORY_PRE_ALLOCATE);
-
+		// managed memory 因子 默认0.7
 		float memoryFraction = configuration.getFloat(TaskManagerOptions.MANAGED_MEMORY_FRACTION);
 		checkConfigParameter(memoryFraction > 0.0f && memoryFraction < 1.0f, memoryFraction,
 			TaskManagerOptions.MANAGED_MEMORY_FRACTION.key(),
