@@ -163,6 +163,9 @@ public class EnvironmentInformation {
 	 */
 	public static long getSizeOfFreeHeapMemory() {
 		Runtime r = Runtime.getRuntime();
+		// getMaxJvmHeapMemory() -- -Xmx
+		// totalMemory() -- 已经从操作系统申请的内存大小
+		// freeMemory()  -- 从操作系统中申请的内存中还没有被使用的内存
 		return getMaxJvmHeapMemory() - r.totalMemory() + r.freeMemory();
 	}
 

@@ -36,8 +36,8 @@ public class Event {
 	 * @param sourceAddress The originating address (think 32 bit IPv4 address).
 	 */
 	public Event(EventType type, int sourceAddress) {
-		this.type = checkNotNull(type);
-		this.sourceAddress = sourceAddress;
+		this.type = checkNotNull(type); // 事件类型
+		this.sourceAddress = sourceAddress; // 事件原始地址
 	}
 
 	/**

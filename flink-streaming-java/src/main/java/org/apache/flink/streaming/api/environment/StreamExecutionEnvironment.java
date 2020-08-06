@@ -1454,7 +1454,7 @@ public abstract class StreamExecutionEnvironment {
 
 		if (typeInfo == null) {
 			if (function instanceof ResultTypeQueryable) {
-				typeInfo = ((ResultTypeQueryable<OUT>) function).getProducedType();
+				typeInfo = ((ResultTypeQueryable<OUT>) function).getProducedType(); // 返回流中元素的类型
 			} else {
 				try {
 					typeInfo = TypeExtractor.createTypeInfo(
@@ -1466,11 +1466,11 @@ public abstract class StreamExecutionEnvironment {
 			}
 		}
 
-		boolean isParallel = function instanceof ParallelSourceFunction;
+		boolean isParallel = function instanceof ParallelSourceFunction; // 数据源是否是并行执行的
 
 		clean(function);
 		StreamSource<OUT, ?> sourceOperator;
-		if (function instanceof StoppableFunction) {
+		if (function instanceof StoppableFunction) { // 是否是可优雅停止的数据源,当接收到terminate命令后,就停止发送新的数据并优雅的关闭,当前排队的数据仍然被发射出去,不需要立即停止
 			sourceOperator = new StoppableStreamSource<>(cast2StoppableSourceFunction(function));
 		} else {
 			sourceOperator = new StreamSource<>(function);

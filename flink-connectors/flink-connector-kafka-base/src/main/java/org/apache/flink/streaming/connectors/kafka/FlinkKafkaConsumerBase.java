@@ -322,7 +322,7 @@ public abstract class FlinkKafkaConsumerBase<T> extends RichParallelSourceFuncti
 		}
 	}
 
-	/**
+	/**在checkpoint时是否将offset提交到kafka
 	 * Specifies whether or not the consumer should commit offsets back to Kafka on checkpoints.
 	 *
 	 * <p>This setting will only have effect if checkpointing is enabled for the job.

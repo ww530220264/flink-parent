@@ -198,11 +198,11 @@ public interface SourceFunction<T> extends Function, Serializable {
 		 * <p>The timestamp that the element will get assigned depends on the time characteristic of
 		 * the streaming program:
 		 * <ul>
-		 *     <li>On {@link TimeCharacteristic#ProcessingTime}, the element has no timestamp.</li>
-		 *     <li>On {@link TimeCharacteristic#IngestionTime}, the element gets the system's
+		 *     <li>On {@link TimeCharacteristic#ProcessingTime}, the element has no timestamp.</li> // 元素没有时间戳
+		 *     <li>On {@link TimeCharacteristic#IngestionTime}, the element gets the system's	// 元素的时间戳时当前系统时间
 		 *         current time as the timestamp.</li>
-		 *     <li>On {@link TimeCharacteristic#EventTime}, the element will have no timestamp initially.
-		 *         It needs to get a timestamp (via a {@link TimestampAssigner}) before any time-dependent
+		 *     <li>On {@link TimeCharacteristic#EventTime}, the element will have no timestamp initially. // 没有初始的时间戳
+		 *         It needs to get a timestamp (via a {@link TimestampAssigner}) before any time-dependent	// 需要通过TimestampAssigner获取
 		 *         operation (like time windows).</li>
 		 * </ul>
 		 *
@@ -239,8 +239,8 @@ public interface SourceFunction<T> extends Function, Serializable {
 		 * elements will be emitted, those elements are considered <i>late</i>.
 		 *
 		 * <p>This method is only relevant when running on {@link TimeCharacteristic#EventTime}.
-		 * On {@link TimeCharacteristic#ProcessingTime},Watermarks will be ignored. On
-		 * {@link TimeCharacteristic#IngestionTime}, the Watermarks will be replaced by the
+		 * On {@link TimeCharacteristic#ProcessingTime},Watermarks will be ignored. On  // ProcessTime会忽略该watermark
+		 * {@link TimeCharacteristic#IngestionTime}, the Watermarks will be replaced by the	// IngestionTime使用ingestion time watermarks覆盖
 		 * automatic ingestion time watermarks.
 		 *
 		 * @param mark The Watermark to emit

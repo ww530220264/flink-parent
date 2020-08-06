@@ -42,7 +42,7 @@ public class Alert {
 	 */
 	public Alert(int address, State state, EventType transition) {
 		this.address = address;
-		this.state = checkNotNull(state);
+		this.state = checkNotNull(state); // 状态机检测的事件状态
 		this.transition = checkNotNull(transition);
 	}
 

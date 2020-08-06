@@ -206,7 +206,7 @@ public class StatusWatermarkValve {
 	/**
 	 * An {@code InputChannelStatus} keeps track of an input channel's last watermark, stream
 	 * status, and whether or not the channel's current watermark is aligned with the overall
-	 * watermark output from the valve.
+	 * watermark output from the valve. // 跟踪管道当前的watermark是否和阀门的输出的整体水印对齐
 	 *
 	 * <p>There are 2 situations where a channel's watermark is not considered aligned:
 	 * <ul>

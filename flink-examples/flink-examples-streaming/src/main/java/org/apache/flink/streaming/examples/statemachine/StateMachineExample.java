@@ -67,10 +67,11 @@ public class StateMachineExample {
 		System.out.println();
 
 		// ---- determine whether to use the built-in source, or read from Kafka ----
-
+		args = new String[2];
+		args[0] = "--kafka-topic";
+		args[1] = "test";
 		final SourceFunction<Event> source;
 		final ParameterTool params = ParameterTool.fromArgs(args);
-
 		if (params.has("kafka-topic")) {
 			// set up the Kafka reader
 			String kafkaTopic = params.get("kafka-topic");
@@ -101,6 +102,7 @@ public class StateMachineExample {
 
 		// create the environment to create streams and configure execution
 		final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+		env.setParallelism(2);
 		env.enableCheckpointing(2000L);
 
 		final String stateBackend = params.get("backend", "memory");
