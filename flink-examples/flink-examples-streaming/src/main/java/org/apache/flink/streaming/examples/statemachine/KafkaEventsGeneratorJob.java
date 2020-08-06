@@ -30,20 +30,22 @@ import org.apache.flink.streaming.examples.statemachine.kafka.EventDeSerializer;
 public class KafkaEventsGeneratorJob {
 
 	public static void main(String[] args) throws Exception {
-
+		args = new String[2];
+		args[0] = "--kafka-topic";
+		args[1] = "test-flink";
 		final ParameterTool params = ParameterTool.fromArgs(args);
 
-		double errorRate = params.getDouble("error-rate", 0.0);
-		int sleep = params.getInt("sleep", 1);
+		double errorRate = params.getDouble("error-rate", 0.1);
+		int sleep = params.getInt("sleep", 10000);
 
 		String kafkaTopic = params.get("kafka-topic");
-		String brokers = params.get("brokers", "localhost:9092");
+		String brokers = params.get("brokers", "cdh1:9092");
 
 		System.out.printf("Generating events to Kafka with standalone source with error rate %f and sleep delay %s millis\n", errorRate, sleep);
 		System.out.println();
 
 		final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-
+		env.setParallelism(2);
 		env
 			.addSource(new EventsGeneratorSource(errorRate, sleep))
 			.addSink(new FlinkKafkaProducer010<>(brokers, kafkaTopic, new EventDeSerializer()));

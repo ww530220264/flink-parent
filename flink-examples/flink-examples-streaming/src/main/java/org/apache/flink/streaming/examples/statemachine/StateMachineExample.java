@@ -69,28 +69,28 @@ public class StateMachineExample {
 		// ---- determine whether to use the built-in source, or read from Kafka ----
 		args = new String[2];
 		args[0] = "--kafka-topic";
-		args[1] = "test";
+		args[1] = "test-flink";
 		final SourceFunction<Event> source;
 		final ParameterTool params = ParameterTool.fromArgs(args);
 		if (params.has("kafka-topic")) {
 			// set up the Kafka reader
 			String kafkaTopic = params.get("kafka-topic");
-			String brokers = params.get("brokers", "localhost:9092");
+			String brokers = params.get("brokers", "cdh1:9092");
 
 			System.out.printf("Reading from kafka topic %s @ %s\n", kafkaTopic, brokers);
 			System.out.println();
 
 			Properties kafkaProps = new Properties();
 			kafkaProps.setProperty("bootstrap.servers", brokers);
-
+			kafkaProps.setProperty("group.id","test-flink");
 			FlinkKafkaConsumer010<Event> kafka = new FlinkKafkaConsumer010<>(kafkaTopic, new EventDeSerializer(), kafkaProps);
-			kafka.setStartFromLatest();
-			kafka.setCommitOffsetsOnCheckpoints(false);
+			kafka.setStartFromGroupOffsets();
+			kafka.setCommitOffsetsOnCheckpoints(true);
 			source = kafka;
 		}
 		else {
-			double errorRate = params.getDouble("error-rate", 0.0);
-			int sleep = params.getInt("sleep", 1);
+			double errorRate = params.getDouble("error-rate", 0.001);
+			int sleep = params.getInt("sleep", 1000);
 
 			System.out.printf("Using standalone source with error rate %f and sleep delay %s millis\n", errorRate, sleep);
 			System.out.println();
@@ -133,7 +133,7 @@ public class StateMachineExample {
 
 		// output the alerts to std-out
 		if (outputFile == null) {
-			alerts.print();
+			alerts.printToErr();
 		} else {
 			alerts
 				.writeAsText(outputFile, FileSystem.WriteMode.OVERWRITE)
@@ -172,7 +172,7 @@ public class StateMachineExample {
 			if (state == null) {
 				state = State.Initial;
 			}
-
+//			System.err.println(evt);
 			// ask the state machine what state we should go to based on the given event
 			State nextState = state.transition(evt.type());
 
