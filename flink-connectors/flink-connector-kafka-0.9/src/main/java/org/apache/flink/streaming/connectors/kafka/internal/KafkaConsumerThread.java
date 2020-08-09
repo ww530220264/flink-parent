@@ -168,7 +168,7 @@ public class KafkaConsumerThread extends Thread {
 		// This is important, because the consumer has multi-threading issues,
 		// including concurrent 'close()' calls.
 		try {
-			this.consumer = getConsumer(kafkaProperties);
+			this.consumer = getConsumer(kafkaProperties); // 创建消费者
 		}
 		catch (Throwable t) {
 			handover.reportError(t);
@@ -208,7 +208,7 @@ public class KafkaConsumerThread extends Thread {
 			// found partitions are not carried across loops using this variable;
 			// they are carried across via re-adding them to the unassigned partitions queue
 			List<KafkaTopicPartitionState<TopicPartition>> newPartitions;
-
+			// 无限循环获取数据
 			// main fetch loop
 			while (running) {
 
@@ -254,7 +254,7 @@ public class KafkaConsumerThread extends Thread {
 				// get the next batch of records, unless we did not manage to hand the old batch over
 				if (records == null) {
 					try {
-						records = consumer.poll(pollTimeout);
+						records = consumer.poll(pollTimeout); // 从kafka拉取数据
 					}
 					catch (WakeupException we) {
 						continue;
@@ -262,7 +262,7 @@ public class KafkaConsumerThread extends Thread {
 				}
 
 				try {
-					handover.produce(records);
+					handover.produce(records); // 将拉取到的数据放入到handover中的next对象中,如果next对象不为空,则阻塞等待
 					records = null;
 				}
 				catch (Handover.WakeupException e) {

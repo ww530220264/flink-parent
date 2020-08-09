@@ -125,7 +125,7 @@ public class RecordWriter<T extends IOReadableWritable> {
 
 		boolean pruneAfterCopying = false;
 		for (int channel : targetChannels) {
-			if (copyFromSerializerToTargetChannel(channel)) {
+			if (copyFromSerializerToTargetChannel(channel)) { // 为目标分区的子分区添加消费者[BufferConsumer],将数据写入BufferBuilder的segmentz中
 				pruneAfterCopying = true;
 			}
 		}
@@ -235,7 +235,7 @@ public class RecordWriter<T extends IOReadableWritable> {
 
 		BufferBuilder bufferBuilder = targetPartition.getBufferProvider().requestBufferBuilderBlocking();
 		bufferBuilders[targetChannel] = Optional.of(bufferBuilder);
-		targetPartition.addBufferConsumer(bufferBuilder.createBufferConsumer(), targetChannel);
+		targetPartition.addBufferConsumer(bufferBuilder.createBufferConsumer(), targetChannel); // 当前子任务的目标分区中添加对应子分区[targetChannel]的消费者
 		return bufferBuilder;
 	}
 

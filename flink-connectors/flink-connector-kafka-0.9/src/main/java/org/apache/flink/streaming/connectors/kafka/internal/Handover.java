@@ -70,7 +70,7 @@ public final class Handover implements Closeable {
 	@Nonnull
 	public ConsumerRecords<byte[], byte[]> pollNext() throws Exception {
 		synchronized (lock) {
-			while (next == null && error == null) {
+			while (next == null && error == null) { // 如果没有数据或异常抛出,则阻塞
 				lock.wait();
 			}
 
@@ -111,7 +111,7 @@ public final class Handover implements Closeable {
 			throws InterruptedException, WakeupException, ClosedException {
 
 		checkNotNull(element);
-
+		// 如果当前数据没有被下游消费者线程取走,则阻塞.否则将生产者线程生产的数据放入到next
 		synchronized (lock) {
 			while (next != null && !wakeupProducer) {
 				lock.wait();

@@ -66,18 +66,18 @@ public class SpanningRecordSerializer<T extends IOReadableWritable> implements R
 	@Override
 	public void serializeRecord(T record) throws IOException {
 		if (CHECKED) {
-			if (dataBuffer.hasRemaining()) {
+			if (dataBuffer.hasRemaining()) { // 序列化的中间缓冲区
 				throw new IllegalStateException("Pending serialization of previous record.");
 			}
 		}
-
+		// serializationBuffer--中间结果的序列化器
 		serializationBuffer.clear();
-		lengthBuffer.clear();
+		lengthBuffer.clear(); // 长度序列化的中间缓冲区
 
 		// write data and length
-		record.write(serializationBuffer);
+		record.write(serializationBuffer); // 将数据写入serializationBuffer中
 
-		int len = serializationBuffer.length();
+		int len = serializationBuffer.length(); // 写入数据的长度
 		lengthBuffer.putInt(0, len);
 
 		dataBuffer = serializationBuffer.wrapAsByteBuffer();
@@ -92,8 +92,8 @@ public class SpanningRecordSerializer<T extends IOReadableWritable> implements R
 	 */
 	@Override
 	public SerializationResult copyToBufferBuilder(BufferBuilder targetBuffer) {
-		targetBuffer.append(lengthBuffer);
-		targetBuffer.append(dataBuffer);
+		targetBuffer.append(lengthBuffer); // 长度
+		targetBuffer.append(dataBuffer);	// 数据
 		targetBuffer.commit();
 
 		return getSerializationResult(targetBuffer);

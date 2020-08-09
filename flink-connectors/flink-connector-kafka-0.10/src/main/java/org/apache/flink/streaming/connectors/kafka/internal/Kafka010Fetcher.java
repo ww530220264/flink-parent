@@ -85,7 +85,7 @@ public class Kafka010Fetcher<T> extends Kafka09Fetcher<T> {
 			long offset,
 			ConsumerRecord<?, ?> consumerRecord) throws Exception {
 
-		// we attach the Kafka 0.10 timestamp here
+		// we attach the Kafka 0.10 timestamp here // 附加kafka的时间戳
 		emitRecordWithTimestamp(record, partition, offset, consumerRecord.timestamp());
 	}
 

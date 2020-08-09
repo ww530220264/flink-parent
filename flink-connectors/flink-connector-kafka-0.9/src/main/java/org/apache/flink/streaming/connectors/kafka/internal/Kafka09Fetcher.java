@@ -63,7 +63,7 @@ public class Kafka09Fetcher<T> extends AbstractFetcher<T, TopicPartition> {
 	private final KeyedDeserializationSchema<T> deserializer;
 
 	/** The handover of data and exceptions between the consumer thread and the task thread. */
-	private final Handover handover;
+	private final Handover handover; // 负责任务线程和消费者线程之间的数据或异常的转移
 
 	/** The thread that runs the actual KafkaConsumer and hand the record batches to this fetcher. */
 	private final KafkaConsumerThread consumerThread;
@@ -123,7 +123,7 @@ public class Kafka09Fetcher<T> extends AbstractFetcher<T, TopicPartition> {
 	public void runFetchLoop() throws Exception {
 		try {
 			final Handover handover = this.handover;
-
+			// 启动真正的卡夫卡消费者线程
 			// kick off the actual Kafka consumer
 			consumerThread.start();
 
@@ -142,13 +142,13 @@ public class Kafka09Fetcher<T> extends AbstractFetcher<T, TopicPartition> {
 						final T value = deserializer.deserialize(
 								record.key(), record.value(),
 								record.topic(), record.partition(), record.offset());
-
+						// 判断value是否代表流结束的标志
 						if (deserializer.isEndOfStream(value)) {
 							// end of stream signaled
 							running = false;
 							break;
 						}
-
+						// 发射数据
 						// emit the actual record. this also updates offset state atomically
 						// and deals with timestamps and watermark generation
 						emitRecord(value, partition, record.offset(), record);

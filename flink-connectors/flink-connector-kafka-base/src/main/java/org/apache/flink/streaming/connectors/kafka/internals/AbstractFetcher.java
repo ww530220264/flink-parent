@@ -391,10 +391,10 @@ public abstract class AbstractFetcher<T, KPH> {
 		if (record != null) {
 			if (timestampWatermarkMode == NO_TIMESTAMPS_WATERMARKS) {
 				// fast path logic, in case there are no watermarks generated in the fetcher
-
+				// 在fetcher中没有watermark生成
 				// emit the record, using the checkpoint lock to guarantee
 				// atomicity of record emission and offset state update
-				synchronized (checkpointLock) {
+				synchronized (checkpointLock) { // 使用检查点锁来保证记录的发送和offset状态更新的原子性
 					sourceContext.collectWithTimestamp(record, timestamp);
 					partitionState.setOffset(offset);
 				}
@@ -704,7 +704,7 @@ public abstract class AbstractFetcher<T, KPH> {
 		public void start() {
 			timerService.registerTimer(timerService.getCurrentProcessingTime() + interval, this);
 		}
-
+		// 上面的timer调用onProcessingTime
 		@Override
 		public void onProcessingTime(long timestamp) throws Exception {
 
@@ -727,6 +727,7 @@ public abstract class AbstractFetcher<T, KPH> {
 			// emit next watermark, if there is one
 			if (isEffectiveMinAggregation && minAcrossAll > lastWatermarkTimestamp) {
 				lastWatermarkTimestamp = minAcrossAll;
+				// 发射watermark
 				emitter.emitWatermark(new Watermark(minAcrossAll));
 			}
 

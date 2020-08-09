@@ -59,10 +59,14 @@ class CreditBasedPartitionRequestClientHandler extends ChannelInboundHandlerAdap
 
 	private static final Logger LOG = LoggerFactory.getLogger(CreditBasedPartitionRequestClientHandler.class);
 
-	/** Channels, which already requested partitions from the producers. */
+	/**
+	 * Channels, which already requested partitions from the producers.
+	 */
 	private final ConcurrentMap<InputChannelID, RemoteInputChannel> inputChannels = new ConcurrentHashMap<>();
 
-	/** Channels, which will notify the producers about unannounced credit. */
+	/**
+	 * Channels, which will notify the producers about unannounced credit.
+	 */
 	private final ArrayDeque<RemoteInputChannel> inputChannelsWithCredit = new ArrayDeque<>();
 
 	private final AtomicReference<Throwable> channelError = new AtomicReference<>();
@@ -243,7 +247,7 @@ class CreditBasedPartitionRequestClientHandler extends ChannelInboundHandlerAdap
 
 	private void decodeMsg(Object msg) throws Throwable {
 		final Class<?> msgClazz = msg.getClass();
-
+		System.err.println(String.format("获取到请求远程分区数据的响应消息: 线程%s 实例%s 消息类型%s", Thread.currentThread().getName(), this, msgClazz));
 		// ---- Buffer --------------------------------------------------------
 		if (msgClazz == NettyMessage.BufferResponse.class) {
 			NettyMessage.BufferResponse bufferOrEvent = (NettyMessage.BufferResponse) msg;

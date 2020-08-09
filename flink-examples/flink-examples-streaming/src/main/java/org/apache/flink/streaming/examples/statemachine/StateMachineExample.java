@@ -69,7 +69,7 @@ public class StateMachineExample {
 		// ---- determine whether to use the built-in source, or read from Kafka ----
 		args = new String[2];
 		args[0] = "--kafka-topic";
-		args[1] = "test-flink";
+		args[1] = "test-f";
 		final SourceFunction<Event> source;
 		final ParameterTool params = ParameterTool.fromArgs(args);
 		if (params.has("kafka-topic")) {
@@ -82,7 +82,7 @@ public class StateMachineExample {
 
 			Properties kafkaProps = new Properties();
 			kafkaProps.setProperty("bootstrap.servers", brokers);
-			kafkaProps.setProperty("group.id","test-flink");
+			kafkaProps.setProperty("group.id","test-f");
 			FlinkKafkaConsumer010<Event> kafka = new FlinkKafkaConsumer010<>(kafkaTopic, new EventDeSerializer(), kafkaProps);
 			kafka.setStartFromGroupOffsets();
 			kafka.setCommitOffsetsOnCheckpoints(true);

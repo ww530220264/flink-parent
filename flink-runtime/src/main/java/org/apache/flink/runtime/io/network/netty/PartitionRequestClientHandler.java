@@ -172,7 +172,7 @@ class PartitionRequestClientHandler extends ChannelInboundHandlerAdapter impleme
 			notifyAllChannelsOfErrorAndClose(tex);
 		}
 	}
-
+	// 获取到请求远程partition数据的响应消息
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 		try {
@@ -235,7 +235,7 @@ class PartitionRequestClientHandler extends ChannelInboundHandlerAdapter impleme
 
 	private boolean decodeMsg(Object msg, boolean isStagedBuffer) throws Throwable {
 		final Class<?> msgClazz = msg.getClass();
-
+		System.err.println(String.format("获取到请求远程分区数据的响应消息: 线程%s 实例%s 消息类型%s", Thread.currentThread().getName(), this, msgClazz));
 		// ---- Buffer --------------------------------------------------------
 		if (msgClazz == NettyMessage.BufferResponse.class) {
 			NettyMessage.BufferResponse bufferOrEvent = (NettyMessage.BufferResponse) msg;

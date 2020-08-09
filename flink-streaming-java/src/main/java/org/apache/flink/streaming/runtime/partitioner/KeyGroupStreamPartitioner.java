@@ -26,7 +26,7 @@ import org.apache.flink.util.Preconditions;
 
 /**
  * Partitioner selects the target channel based on the key group index.
- *
+ * 分区器根据key选择目标channel
  * @param <T> Type of the elements in the Stream being partitioned
  */
 @Internal
@@ -56,10 +56,10 @@ public class KeyGroupStreamPartitioner<T, K> extends StreamPartitioner<T> implem
 
 		K key;
 		try {
-			key = keySelector.getKey(record.getInstance().getValue());
+			key = keySelector.getKey(record.getInstance().getValue()); // 获取key
 		} catch (Exception e) {
 			throw new RuntimeException("Could not extract key from " + record.getInstance().getValue(), e);
-		}
+		} // 根据key计算该条记录应该分配到哪个子分区中
 		returnArray[0] = KeyGroupRangeAssignment.assignKeyToParallelOperator(key, maxParallelism, numberOfOutputChannels);
 		return returnArray;
 	}

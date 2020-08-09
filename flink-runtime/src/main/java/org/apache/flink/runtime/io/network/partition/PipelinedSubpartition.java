@@ -301,7 +301,7 @@ class PipelinedSubpartition extends ResultSubpartition {
 	}
 
 	private boolean shouldNotifyDataAvailable() {
-		// Notify only when we added first finished buffer.
+		// Notify only when we added first finished buffer.//当且仅当添加完第一个完成的buffered时通知
 		return readView != null && !flushRequested && getNumberOfFinishedBuffers() == 1;
 	}
 

@@ -174,9 +174,9 @@ public final class StreamElementSerializer<T> extends TypeSerializer<StreamEleme
 				target.write(TAG_REC_WITH_TIMESTAMP);
 				target.writeLong(record.getTimestamp());
 			} else {
-				target.write(TAG_REC_WITHOUT_TIMESTAMP);
+				target.write(TAG_REC_WITHOUT_TIMESTAMP); // 是否有timestamp的标识
 			}
-			typeSerializer.serialize(record.getValue(), target);
+			typeSerializer.serialize(record.getValue(), target); // 将数据写入target中
 		}
 		else if (value.isWatermark()) {
 			target.write(TAG_WATERMARK);

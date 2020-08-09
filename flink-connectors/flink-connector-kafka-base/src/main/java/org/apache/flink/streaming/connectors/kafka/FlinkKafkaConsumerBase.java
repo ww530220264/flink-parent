@@ -637,8 +637,8 @@ public abstract class FlinkKafkaConsumerBase<T> extends RichParallelSourceFuncti
 			sourceContext.markAsTemporarilyIdle();
 		}
 
-		// from this point forward:
-		//   - 'snapshotState' will draw offsets from the fetcher,
+		// from this point forward:从现在开始
+		//   - 'snapshotState' will draw offsets from the fetcher,从fecther中提取偏移量
 		//     instead of being built from `subscribedPartitionsToStartOffsets`
 		//   - 'notifyCheckpointComplete' will start to do work (i.e. commit offsets to
 		//     Kafka through the fetcher, if configured to do so)
